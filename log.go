@@ -5,47 +5,74 @@ import (
 	"time"
 )
 
+var (
+	enable = true
+)
+
 // Log ...
-func (o *Logger) Log(content string) {
+func (o *Logger) Log(content ...string) (err error) {
 
-	if !o.enable {
-		return
-	}
-
-	var s string
-
+	var t *time.Time
 	if o.time != TimeNone {
-
-		t := time.Now()
-
-		switch o.time {
-		case TimeMS:
-			s = t.Format(`15:04:05.000 `)
-		case TimeDayMS:
-			s = t.Format(`02 15:04:05.000 `)
-		case TimeMonthMS:
-			s = t.Format(`01-02 15:04:05.000 `)
-		case TimeYearMS:
-			s = t.Format(`2006-01-02 15:04:05.000 `)
-		case TimeDay:
-			s = t.Format(`02 15:04:05 `)
-		case TimeMonth:
-			s = t.Format(`01-02 15:04:05 `)
-		case TimeYear:
-			s = t.Format(`2006-01-02 15:04:05 `)
-		}
+		ti := time.Now()
+		t = &ti
 	}
 
-	if o.file != nil {
-		o.file.WriteString(s)
+	if !o.useTunnel {
+		return o.log(t, content...)
 	}
 
-	if o.echo {
-		fmt.Println(s)
+	o.tunnel <- &msg{
+		time:    t,
+		content: content,
+	}
+
+	return
+}
+
+func (o *Logger) bgLog() {
+	for {
+		msg := <-o.tunnel
+		o.log(msg.time, msg.content...)
 	}
 }
 
-// Enable ...
-func (o *Logger) Enable(is bool) {
-	o.enable = is
+func (o *Logger) log(t *time.Time, content ...string) (err error) {
+
+	if !o.enable || !enable {
+		return
+	}
+
+	o.buf.Reset()
+	if t != nil {
+		o.buf.WriteString(o.genTime(t))
+	}
+
+	first := true
+	for _, v := range content {
+		if first {
+			first = false
+		} else {
+			o.buf.WriteRune(' ')
+		}
+		o.buf.WriteString(v)
+	}
+	o.buf.WriteRune('\n')
+
+	s := o.buf.String()
+
+	if o.file != nil {
+		_, err = o.file.WriteString(s)
+		if err != nil {
+			o.enable = false
+			o.err = err
+			return
+		}
+	}
+
+	if o.echo {
+		fmt.Print(s)
+	}
+
+	return
 }
