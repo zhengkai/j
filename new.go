@@ -2,7 +2,6 @@ package j
 
 import (
 	"bytes"
-	"fmt"
 	"os"
 )
 
@@ -11,15 +10,23 @@ const (
 	flagAppend = os.O_CREATE | os.O_WRONLY | os.O_APPEND
 )
 
-// New create a new logger
-func New(c *Config) (o *Logger, err error) {
+// New create a new logger with filename
+func New(filename string) (o *Logger, err error) {
+	config := &Config{
+		Filename: filename,
+		Time:     TimeMS,
+	}
+	return NewCustom(config)
+}
+
+// NewCustom create a new logger with config
+func NewCustom(c *Config) (o *Logger, err error) {
 
 	o = &Logger{
-		enable: true,
-		// echo:   c.Echo,
+		enable:    true,
+		echo:      c.Echo,
 		buf:       &bytes.Buffer{},
-		time:      c.Time,
-		useTunnel: c.Tunnel,
+		useTunnel: c.Tunnel > 0,
 	}
 
 	if len(c.Filename) > 0 {
@@ -30,17 +37,19 @@ func New(c *Config) (o *Logger, err error) {
 		}
 	}
 
-	if c.Time == TimeCustom {
-		o.timeFormat = c.TimeFormat
+	if len(c.Time) > 0 {
+		o.useTime = true
+		o.timeFormat = c.Time
+	}
+
+	if len(c.Prefix) > 0 {
+		o.usePrefix = true
+		o.prefix = c.Prefix
 	}
 
 	if o.useTunnel {
-		o.tunnel = make(chan *msg, 1000)
-		fmt.Println(`start bgLog`)
-		go func() {
-			o.bgLog()
-			fmt.Println(`start bgLog end`)
-		}()
+		o.tunnel = make(chan *msg, c.Tunnel)
+		go o.bgLog()
 	}
 
 	return

@@ -9,55 +9,115 @@ var (
 	enable = true
 )
 
-// Log ...
-func (o *Logger) Log(content ...string) (err error) {
+// Log just like log.Println
+func (o *Logger) Log(a ...interface{}) (err error) {
+	return o.sendLog(msgPrintln, a...)
+}
 
-	var t *time.Time
-	if o.time != TimeNone {
-		ti := time.Now()
-		t = &ti
-	}
+// Logf just like log.Printf
+func (o *Logger) Logf(format string, a ...interface{}) (err error) {
+	return o.sendLog(msgPrintf, format, fmt.Sprintf(format, a...))
+}
 
-	if !o.useTunnel {
-		return o.log(t, content...)
-	}
+// Print just like log.Print, added linebreak
+func (o *Logger) Print(format string, a ...interface{}) (err error) {
+	return o.sendLog(msgPrint, a...)
+}
 
-	o.tunnel <- &msg{
-		time:    t,
+// Compact just like fmt.Print, but no spaces
+func (o *Logger) Compact(format string, a ...interface{}) (err error) {
+	return o.sendLog(msgCompact, format, fmt.Sprintf(format, a...))
+}
+
+// Raw log raw (no time, no linebreak, no spaces)
+func (o *Logger) Raw(a ...interface{}) (err error) {
+	return o.sendLog(msgRaw, a...)
+}
+
+// BR add an empty line
+func (o *Logger) BR() (err error) {
+	return o.sendLog(msgRaw, "\n")
+}
+
+func (o *Logger) sendLog(t msgType, content ...interface{}) (err error) {
+
+	m := &msg{
+		t:       t,
 		content: content,
+		raw:     t == msgRaw || t == msgColor,
+	}
+	if o.useTime && !m.raw {
+		now := time.Now()
+		m.time = &now
 	}
 
-	return
-}
-
-func (o *Logger) bgLog() {
-	for {
-		msg := <-o.tunnel
-		o.log(msg.time, msg.content...)
-	}
-}
-
-func (o *Logger) log(t *time.Time, content ...string) (err error) {
-
-	if !o.enable || !enable {
+	if o.useTunnel {
+		o.tunnel <- m
 		return
 	}
 
+	return o.doLog(m)
+}
+
+func (o *Logger) bgLog() {
+
+	for {
+		msg := <-o.tunnel
+
+		if msg.op > 0 {
+
+			switch msg.op {
+
+			case opClose:
+				o.enable = false
+				o.stopWait.Done()
+				return
+
+			case opEnable:
+				o.enable = true
+
+			case opDisable:
+				o.enable = false
+			}
+		}
+
+		o.doLog(msg)
+	}
+}
+
+func (o *Logger) doLog(m *msg) (err error) {
+
 	o.buf.Reset()
-	if t != nil {
-		o.buf.WriteString(o.genTime(t))
+	if o.usePrefix && !m.raw {
+		o.buf.WriteString(o.prefix)
+	}
+	if m.time != nil {
+		o.buf.WriteString(m.time.Format(o.timeFormat))
 	}
 
-	first := true
-	for _, v := range content {
-		if first {
-			first = false
-		} else {
-			o.buf.WriteRune(' ')
+	switch m.t {
+	case msgPrintln:
+		o.buf.WriteString(fmt.Sprintln(m.content...))
+	case msgPrintf:
+		o.buf.WriteString(fmt.Sprintf(m.content[0].(string), m.content[1:]...))
+	case msgPrint:
+		o.buf.WriteString(fmt.Sprint(m.content...))
+	case msgCompact, msgRaw:
+		for _, v := range m.content {
+			o.buf.WriteString(fmt.Sprint(v))
 		}
-		o.buf.WriteString(v)
+	case msgColor:
+		o.buf.WriteString("\x1b[")
+		o.buf.WriteString(m.content[0].(string))
+		o.buf.WriteRune('m')
 	}
-	o.buf.WriteRune('\n')
+
+	switch m.t {
+	case msgRaw, msgPrintln, msgColor:
+		// nothing
+	default:
+		o.buf.WriteRune('\n')
+	}
 
 	s := o.buf.String()
 

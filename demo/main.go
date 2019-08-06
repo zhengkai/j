@@ -1,26 +1,57 @@
 package main
 
 import (
-	"fmt"
 	"j"
-	"time"
+	"sync"
+)
+
+var (
+	w *sync.WaitGroup
 )
 
 func main() {
-	x, err := j.New(&j.Config{
-		Filename: `test`,
-		Echo:     true,
+
+	w = &sync.WaitGroup{}
+
+	x, _ := j.NewCustom(&j.Config{
+		Filename: `test-x`,
 		Time:     j.TimeNS,
-		Tunnel:   true,
+		Tunnel:   1000,
 	})
 
-	if err != nil {
-		return
-	}
-	for i := 0; i < 10; i++ {
-		x.Log(`abc`, fmt.Sprintf(`x: %d`, i))
-	}
-	x.Log(`end`)
+	y, _ := j.NewCustom(&j.Config{
+		Filename: `test-y`,
+		Time:     j.TimeNS,
+		Tunnel:   0,
+	})
 
-	time.Sleep(10 * time.Second)
+	z1, _ := j.NewCustom(&j.Config{
+		Filename: `test-z1`,
+		Prefix:   `[prefix]`,
+		Time:     j.TimeNS,
+		Tunnel:   0,
+	})
+
+	z2, _ := j.NewCustom(&j.Config{
+		Filename: `test-z2`,
+		Prefix:   `[prefix]`,
+		Tunnel:   0,
+	})
+
+	w.Add(4)
+	go testNum(x)
+	go testNum(y)
+	go testNum(z1)
+	go testNum(z2)
+
+	c, _ := j.NewCustom(&j.Config{
+		Filename: `test-color`,
+		Time:     j.TimeNS,
+		Tunnel:   1000,
+		Append:   true,
+	})
+	w.Add(1)
+	go testColor(c)
+
+	w.Wait()
 }
