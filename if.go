@@ -28,6 +28,7 @@ type Config struct {
 	Prefix   string
 	Time     string // format if Time == TimeCustom
 	Tunnel   int    // channel buffer size
+	FileFunc func(t *time.Time) string
 }
 
 // Logger ...
@@ -45,6 +46,8 @@ type Logger struct {
 	stopWait   *sync.WaitGroup
 	useTunnel  bool
 	tunnel     chan *msg
+	fileFunc   func(t *time.Time) string
+	filePrev   string
 }
 
 type msg struct {

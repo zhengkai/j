@@ -79,6 +79,8 @@ func (o *Logger) bgLog() {
 			case opDisable:
 				o.enable = false
 			}
+
+			continue
 		}
 
 		o.doLog(msg)
@@ -86,6 +88,10 @@ func (o *Logger) bgLog() {
 }
 
 func (o *Logger) doLog(m *msg) (err error) {
+
+	if o.fileFunc != nil {
+		o.changeFile(m.time)
+	}
 
 	o.buf.Reset()
 	if o.usePrefix && !m.raw {
@@ -135,4 +141,29 @@ func (o *Logger) doLog(m *msg) (err error) {
 	}
 
 	return
+}
+
+func (o *Logger) changeFile(t *time.Time) {
+
+	if t == nil {
+		now := time.Now()
+		t = &now
+	}
+
+	filename := o.fileFunc(t)
+	if filename == o.filePrev {
+		return
+	}
+
+	file, err := openFile(filename, true)
+	if err != nil {
+		o.err = err
+		o.filePrev = filename
+		return
+	}
+
+	o.file.Sync()
+	o.file.Close()
+
+	o.file = file
 }

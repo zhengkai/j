@@ -2,7 +2,10 @@ package j
 
 import (
 	"bytes"
+	"fmt"
 	"os"
+	"path/filepath"
+	"time"
 )
 
 const (
@@ -29,6 +32,11 @@ func NewCustom(c *Config) (o *Logger, err error) {
 		useTunnel: c.Tunnel > 0,
 	}
 
+	if c.FileFunc != nil {
+		o.fileFunc = c.FileFunc
+		now := time.Now()
+		c.Filename = c.FileFunc(&now)
+	}
 	if len(c.Filename) > 0 {
 		o.file, err = openFile(c.Filename, c.Append)
 		if err != nil {
@@ -57,6 +65,11 @@ func NewCustom(c *Config) (o *Logger, err error) {
 
 func openFile(filename string, isAppend bool) (f *os.File, err error) {
 
+	err = checkDir(filename)
+	if err != nil {
+		return
+	}
+
 	flag := flagNew
 	if isAppend {
 		flag = flagAppend
@@ -65,6 +78,33 @@ func openFile(filename string, isAppend bool) (f *os.File, err error) {
 	f, err = os.OpenFile(filename, flag, 0644)
 	if err != nil {
 		return
+	}
+
+	return
+}
+
+func checkDir(filename string) (err error) {
+
+	dir, _ := filepath.Split(filename)
+
+	if dir == `` {
+		fmt.Println(`no dir`, filename)
+		return
+	}
+
+	err = os.MkdirAll(dir, 0755)
+	if err != nil {
+		return
+	}
+
+	f, err := os.Lstat(dir)
+	if err != nil {
+		return
+	}
+
+	mode := f.Mode()
+	if !mode.IsDir() {
+		return fmt.Errorf(`not a dir "%s"`, dir)
 	}
 
 	return
