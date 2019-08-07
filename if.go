@@ -2,6 +2,7 @@ package j
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"sync"
 	"time"
@@ -14,22 +15,15 @@ const (
 	msgCompact
 	msgRaw
 	msgColor
+	msgColorOnce
 
 	opClose = opType(iota + 1)
 	opEnable
 	opDisable
 )
 
-// Config ...
-type Config struct {
-	Filename string
-	Echo     bool // stdout
-	Append   bool
-	Prefix   string
-	Time     string // format if Time == TimeCustom
-	Tunnel   int    // channel buffer size
-	FileFunc func(t *time.Time) string
-}
+type msgType uint8
+type opType uint8
 
 // Logger ...
 type Logger struct {
@@ -44,6 +38,7 @@ type Logger struct {
 	buf        *bytes.Buffer
 	stop       bool
 	stopWait   *sync.WaitGroup
+	colorOnce  bool
 	useTunnel  bool
 	tunnel     chan *msg
 	fileFunc   func(t *time.Time) string
@@ -59,52 +54,32 @@ type msg struct {
 	stop    bool
 }
 
-type msgType uint8
-type opType uint8
-
-// Close ...
-func (o *Logger) Close() {
-	if o.stop {
-		return
-	}
-	o.stop = true
-
-	if !o.useTunnel {
-		return
-	}
-
-	w := &sync.WaitGroup{}
-	o.stopWait = w
-	w.Add(1)
-	o.tunnel <- &msg{
-		op: opClose,
-	}
-	w.Wait()
-
-	if o.file != nil {
-		o.file.Sync()
-		o.file.Close()
-		o.file = nil
-	}
+// Log just like log.Println
+func (o *Logger) Log(a ...interface{}) (err error) {
+	return o.sendLog(msgPrintln, a...)
 }
 
-// Enable ...
-func (o *Logger) Enable(is bool) {
-	if o.stop {
-		return
-	}
+// Logf just like log.Printf
+func (o *Logger) Logf(format string, a ...interface{}) (err error) {
+	return o.sendLog(msgPrintf, format, fmt.Sprintf(format, a...))
+}
 
-	if !o.useTunnel {
-		o.enable = is
-		return
-	}
+// Print just like log.Print, added linebreak
+func (o *Logger) Print(format string, a ...interface{}) (err error) {
+	return o.sendLog(msgPrint, a...)
+}
 
-	op := opEnable
-	if !is {
-		op = opDisable
-	}
+// Compact just like fmt.Print, but no spaces
+func (o *Logger) Compact(format string, a ...interface{}) (err error) {
+	return o.sendLog(msgCompact, format, fmt.Sprintf(format, a...))
+}
 
-	o.tunnel <- &msg{
-		op: op,
-	}
+// Raw log raw (no time, no linebreak, no spaces)
+func (o *Logger) Raw(a ...interface{}) (err error) {
+	return o.sendLog(msgRaw, a...)
+}
+
+// BR add an empty line
+func (o *Logger) BR() (err error) {
+	return o.sendLog(msgRaw, "\n")
 }

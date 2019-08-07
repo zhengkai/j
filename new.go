@@ -2,21 +2,34 @@ package j
 
 import (
 	"bytes"
-	"fmt"
-	"os"
-	"path/filepath"
 	"time"
 )
 
-const (
-	flagNew    = os.O_CREATE | os.O_WRONLY | os.O_TRUNC
-	flagAppend = os.O_CREATE | os.O_WRONLY | os.O_APPEND
-)
+// Config ...
+type Config struct {
+	Filename string
+	Echo     bool // stdout
+	Append   bool
+	Prefix   string
+	Time     string // format if Time == TimeCustom
+	Tunnel   int    // channel buffer size
+	FileFunc func(t *time.Time) string
+}
 
 // New create a new logger with filename
 func New(filename string) (o *Logger, err error) {
 	config := &Config{
 		Filename: filename,
+		Time:     TimeMS,
+	}
+	return NewCustom(config)
+}
+
+// NewFunc create a new logger with FileFunc
+func NewFunc(fn func(t *time.Time) string) (o *Logger, err error) {
+	config := &Config{
+		FileFunc: fn,
+		Append:   true,
 		Time:     TimeMS,
 	}
 	return NewCustom(config)
@@ -58,53 +71,6 @@ func NewCustom(c *Config) (o *Logger, err error) {
 	if o.useTunnel {
 		o.tunnel = make(chan *msg, c.Tunnel)
 		go o.bgLog()
-	}
-
-	return
-}
-
-func openFile(filename string, isAppend bool) (f *os.File, err error) {
-
-	err = checkDir(filename)
-	if err != nil {
-		return
-	}
-
-	flag := flagNew
-	if isAppend {
-		flag = flagAppend
-	}
-
-	f, err = os.OpenFile(filename, flag, 0644)
-	if err != nil {
-		return
-	}
-
-	return
-}
-
-func checkDir(filename string) (err error) {
-
-	dir, _ := filepath.Split(filename)
-
-	if dir == `` {
-		fmt.Println(`no dir`, filename)
-		return
-	}
-
-	err = os.MkdirAll(dir, 0755)
-	if err != nil {
-		return
-	}
-
-	f, err := os.Lstat(dir)
-	if err != nil {
-		return
-	}
-
-	mode := f.Mode()
-	if !mode.IsDir() {
-		return fmt.Errorf(`not a dir "%s"`, dir)
 	}
 
 	return
