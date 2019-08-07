@@ -22,8 +22,16 @@ const (
 	opDisable
 )
 
+// just like Lshortfile/Llongfile in pkg/log
+const (
+	CallerNone = callerType(iota + 1)
+	CallerShort
+	CallerLong
+)
+
 type msgType uint8
 type opType uint8
+type callerType uint8
 
 // Logger ...
 type Logger struct {
@@ -44,6 +52,7 @@ type Logger struct {
 	fileFunc   func(t *time.Time) (filename string)
 	filePrev   string
 	lineFunc   func(line *string)
+	caller     callerType
 }
 
 type msg struct {
@@ -53,6 +62,12 @@ type msg struct {
 	time    *time.Time
 	content []interface{}
 	stop    bool
+	caller  *caller
+}
+
+type caller struct {
+	file string
+	line int
 }
 
 // Log just like log.Println

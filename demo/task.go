@@ -27,28 +27,32 @@ func taskColorOnce() {
 		*s = r
 	}
 
-	x1, err := j.NewCustom(&j.Config{
+	x1, err := j.New(&j.Config{
 		Filename:   `log/color-same`,
 		Prefix:     `[ X1 ] `,
 		TimeFormat: j.TimeNS,
 		Tunnel:     1000,
 		LineFunc:   fn,
+		Caller:     j.CallerShort,
 	})
 
 	if err != nil {
-		fmt.Println(`taskSameFile 1`, err)
+		fmt.Println(`taskColorOnce x1`, err)
 		return
 	}
+
+	x2 := j.NewEcho()
 
 	w.Add(2)
 	go testFly(x1, ``)
 	time.Sleep(time.Second / 2)
 	go testFly(x1, `38;2;200;255;100`)
+	go testFly(x2, `38;2;200;255;100`)
 }
 
 func taskSameFile() {
 
-	x1, err := j.NewCustom(&j.Config{
+	x1, err := j.New(&j.Config{
 		FileFunc: func(t *time.Time) string {
 			return t.Format(`log/same-01-02/15/04`)
 		},
@@ -62,7 +66,7 @@ func taskSameFile() {
 		return
 	}
 
-	x2, err := j.NewCustom(&j.Config{
+	x2, err := j.New(&j.Config{
 		FileFunc: func(t *time.Time) string {
 			return t.Format(`log/same-01-02/15/04`)
 		},
@@ -83,7 +87,7 @@ func taskSameFile() {
 
 func taskColor() {
 
-	c, _ := j.NewCustom(&j.Config{
+	c, _ := j.New(&j.Config{
 		Filename:   `log/color/text`,
 		TimeFormat: j.TimeNS,
 		Tunnel:     1000,
@@ -94,7 +98,7 @@ func taskColor() {
 }
 
 func taskDir() {
-	check, err := j.NewCustom(&j.Config{
+	check, err := j.New(&j.Config{
 		FileFunc: func(t *time.Time) string {
 			return t.Format(`log/01-02/15/04`)
 		},
@@ -113,7 +117,7 @@ func taskDir() {
 
 func taskN() {
 
-	x, _ := j.NewCustom(&j.Config{
+	x, _ := j.New(&j.Config{
 		FileFunc: func(t *time.Time) string {
 			return t.Format(`log/test/2006-01-02`)
 		},
@@ -121,20 +125,20 @@ func taskN() {
 		Tunnel:     1000,
 	})
 
-	y, _ := j.NewCustom(&j.Config{
+	y, _ := j.New(&j.Config{
 		Filename:   `log-y`,
 		TimeFormat: j.TimeNS,
 		Tunnel:     0,
 	})
 
-	z1, _ := j.NewCustom(&j.Config{
+	z1, _ := j.New(&j.Config{
 		Filename:   `log/test-z1`,
 		Prefix:     `[prefix] `,
 		TimeFormat: j.TimeNS,
 		Tunnel:     0,
 	})
 
-	z2, _ := j.NewCustom(&j.Config{
+	z2, _ := j.New(&j.Config{
 		Filename: `log/test-z2`,
 		Prefix:   `[prefix] `,
 		Tunnel:   0,

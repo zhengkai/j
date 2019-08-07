@@ -15,15 +15,28 @@ type Config struct {
 	Tunnel     int // channel buffer size
 	FileFunc   func(t *time.Time) (filename string)
 	LineFunc   func(line *string)
+	Caller     callerType
 }
 
-// New create a new logger with filename
-func New(filename string) (o *Logger, err error) {
+// NewEcho create a new logger without file, only stdout
+func NewEcho() (o *Logger) {
+	config := &Config{
+		Echo:       true,
+		TimeFormat: TimeMS,
+		Caller:     CallerShort,
+	}
+	o, _ = New(config)
+	return
+}
+
+// NewFile create a new logger with filename
+func NewFile(filename string) (o *Logger, err error) {
 	config := &Config{
 		Filename:   filename,
 		TimeFormat: TimeMS,
+		Caller:     CallerShort,
 	}
-	return NewCustom(config)
+	return New(config)
 }
 
 // NewFunc create a new logger with FileFunc
@@ -32,12 +45,13 @@ func NewFunc(fn func(t *time.Time) (filename string)) (o *Logger, err error) {
 		FileFunc:   fn,
 		Append:     true,
 		TimeFormat: TimeMS,
+		Caller:     CallerShort,
 	}
-	return NewCustom(config)
+	return New(config)
 }
 
-// NewCustom create a new logger with config
-func NewCustom(c *Config) (o *Logger, err error) {
+// New create a new logger with config
+func New(c *Config) (o *Logger, err error) {
 
 	o = &Logger{
 		enable:    true,
@@ -46,6 +60,8 @@ func NewCustom(c *Config) (o *Logger, err error) {
 		useTunnel: c.Tunnel > 0,
 		lineFunc:  c.LineFunc,
 	}
+
+	o.caller = c.Caller
 
 	if c.FileFunc != nil {
 		o.fileFunc = c.FileFunc

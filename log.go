@@ -3,6 +3,8 @@ package j
 import (
 	"bytes"
 	"fmt"
+	"path/filepath"
+	"runtime"
 	"time"
 )
 
@@ -17,9 +19,25 @@ func (o *Logger) sendLog(t msgType, content ...interface{}) (err error) {
 		content: content,
 		raw:     t == msgRaw || t == msgColor || t == msgColorOnce,
 	}
-	if o.useTime && !m.raw {
-		now := time.Now()
-		m.time = &now
+
+	if !m.raw {
+
+		if o.caller > 0 {
+			_, file, line, ok := runtime.Caller(2)
+			c := &caller{}
+			if ok {
+				c.file = file
+				c.line = line
+			} else {
+				c.file = `???`
+			}
+			m.caller = c
+		}
+
+		if o.useTime {
+			now := time.Now()
+			m.time = &now
+		}
 	}
 
 	if o.useTunnel {
@@ -94,6 +112,14 @@ func (o *Logger) parseMsg(m *msg) {
 	}
 	if m.time != nil {
 		o.buf.WriteString(m.time.Format(o.timeFormat))
+	}
+
+	if m.caller != nil {
+		file := m.caller.file
+		if o.caller == CallerShort {
+			_, file = filepath.Split(file)
+		}
+		o.buf.WriteString(fmt.Sprintf(`%s:%d `, file, m.caller.line))
 	}
 
 	parseByMsgType(m, o.buf)
