@@ -41,8 +41,9 @@ type Logger struct {
 	colorOnce  bool
 	useTunnel  bool
 	tunnel     chan *msg
-	fileFunc   func(t *time.Time) string
+	fileFunc   func(t *time.Time) (filename string)
 	filePrev   string
+	lineFunc   func(line *string)
 }
 
 type msg struct {

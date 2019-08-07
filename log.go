@@ -64,24 +64,12 @@ func (o *Logger) doLog(m *msg) (err error) {
 		o.changeFile(m.time)
 	}
 
-	o.buf.Reset()
-	if o.usePrefix && !m.raw {
-		o.buf.WriteString(o.prefix)
-	}
-	if m.time != nil {
-		o.buf.WriteString(m.time.Format(o.timeFormat))
-	}
-
-	parseMsg(m, o.buf)
-
-	if m.t == msgColorOnce {
-		o.colorOnce = true
-	} else if o.colorOnce && m.t != msgColor {
-		o.colorOnce = false
-		o.buf.WriteString("\x1b[0m")
-	}
-
+	o.parseMsg(m)
 	s := o.buf.String()
+
+	if !m.raw && o.lineFunc != nil {
+		o.lineFunc(&s)
+	}
 
 	if o.file != nil {
 		_, err = o.file.WriteString(s)
@@ -99,19 +87,43 @@ func (o *Logger) doLog(m *msg) (err error) {
 	return
 }
 
-func parseMsg(m *msg, buf *bytes.Buffer) {
+func (o *Logger) parseMsg(m *msg) {
+	o.buf.Reset()
+	if o.usePrefix && !m.raw {
+		o.buf.WriteString(o.prefix)
+	}
+	if m.time != nil {
+		o.buf.WriteString(m.time.Format(o.timeFormat))
+	}
+
+	parseByMsgType(m, o.buf)
+
+	if m.t == msgColorOnce {
+		o.colorOnce = true
+	} else if o.colorOnce && m.t != msgColor {
+		o.colorOnce = false
+		o.buf.WriteString("\x1b[0m")
+	}
+}
+
+func parseByMsgType(m *msg, buf *bytes.Buffer) {
 
 	switch m.t {
+
 	case msgPrintln:
 		buf.WriteString(fmt.Sprintln(m.content...))
+
 	case msgPrintf:
 		buf.WriteString(fmt.Sprintf(m.content[0].(string), m.content[1:]...))
+
 	case msgPrint:
 		buf.WriteString(fmt.Sprint(m.content...))
+
 	case msgCompact, msgRaw:
 		for _, v := range m.content {
 			buf.WriteString(fmt.Sprint(v))
 		}
+
 	case msgColor, msgColorOnce:
 		buf.WriteString("\x1b[")
 		buf.WriteString(m.content[0].(string))

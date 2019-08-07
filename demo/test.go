@@ -51,7 +51,7 @@ func testFly(o *j.Logger, color string) {
 	for {
 		i++
 
-		if useColor {
+		if useColor && i%3 == 1 {
 			o.ColorOnce(color)
 		}
 		o.Log(randStr(20), i)

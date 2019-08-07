@@ -7,30 +7,31 @@ import (
 
 // Config ...
 type Config struct {
-	Filename string
-	Echo     bool // stdout
-	Append   bool
-	Prefix   string
-	Time     string // format if Time == TimeCustom
-	Tunnel   int    // channel buffer size
-	FileFunc func(t *time.Time) string
+	Filename   string
+	Echo       bool // stdout
+	Append     bool
+	Prefix     string
+	TimeFormat string
+	Tunnel     int // channel buffer size
+	FileFunc   func(t *time.Time) (filename string)
+	LineFunc   func(line *string)
 }
 
 // New create a new logger with filename
 func New(filename string) (o *Logger, err error) {
 	config := &Config{
-		Filename: filename,
-		Time:     TimeMS,
+		Filename:   filename,
+		TimeFormat: TimeMS,
 	}
 	return NewCustom(config)
 }
 
 // NewFunc create a new logger with FileFunc
-func NewFunc(fn func(t *time.Time) string) (o *Logger, err error) {
+func NewFunc(fn func(t *time.Time) (filename string)) (o *Logger, err error) {
 	config := &Config{
-		FileFunc: fn,
-		Append:   true,
-		Time:     TimeMS,
+		FileFunc:   fn,
+		Append:     true,
+		TimeFormat: TimeMS,
 	}
 	return NewCustom(config)
 }
@@ -43,6 +44,7 @@ func NewCustom(c *Config) (o *Logger, err error) {
 		echo:      c.Echo,
 		buf:       &bytes.Buffer{},
 		useTunnel: c.Tunnel > 0,
+		lineFunc:  c.LineFunc,
 	}
 
 	if c.FileFunc != nil {
@@ -58,9 +60,9 @@ func NewCustom(c *Config) (o *Logger, err error) {
 		}
 	}
 
-	if len(c.Time) > 0 {
+	if len(c.TimeFormat) > 0 {
 		o.useTime = true
-		o.timeFormat = c.Time
+		o.timeFormat = c.TimeFormat
 	}
 
 	if len(c.Prefix) > 0 {
