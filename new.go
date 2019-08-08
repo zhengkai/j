@@ -2,6 +2,7 @@ package j
 
 import (
 	"bytes"
+	"os"
 	"time"
 )
 
@@ -16,6 +17,8 @@ type Config struct {
 	FileFunc   func(t *time.Time) (filename string)
 	LineFunc   func(line *string)
 	Caller     callerType
+	UmarkFile  os.FileMode
+	UmarkDir   os.FileMode
 }
 
 // NewEcho create a new logger without file, only stdout

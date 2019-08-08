@@ -1,0 +1,15 @@
+language: go
+go:
+- 1.12
+- master
+install:
+- go get golang.org/x/tools/cmd/cover
+- go get github.com/mattn/goveralls
+script:
+- cd test && go test -v -test.bench=".*" -test.benchmem -coverpkg github.com/zhengkai/j -covermode=count -coverprofile=coverage.out .
+- "$HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN"
+env:
+  matrix:
+  - GO111MODULE=on
+  global:
+    secure: u81Lzdjy6rujRhJPVQ5HuJGu4NKi+HMm9S1Mmrh3elxWV+zqbZ0dNAohisNAb3swnkLfRJ3VG5oDSDZKnTX9+8gzuI7iA/kFNsreKsuTpXM+HYmbPze6iqHuXU1n2dVUUGXL8K0CbjS7RkHLaks1bBP08adyefO55ovTMowsdW6zt4st+w+8YkKZ8Y3rS4dNV+BfcvcmETI7kugGL1EZpY/YGht4QLTkFDOmBeOSG8xvN8PCmoszPsj7afrQ7qVpSkvdfONWo4ZFfTftUmXzHd2V9wfTtPuKCD2Dh1hxxc1Hn8RuqOd4fud0LmXBIO2GEilIpheQ4qi41M75hg1cNlphfaf0InMmwTDw9+H7Y3I20S5RKppK24tO5QeUIf7RhK3xZcuTesaTicIxuMr5xxIeorms70oe8G5hOnJR2zFe+WZmDMbviYaP6DVskkpd0aR70qfAKdGvn5patxXCtuuHRENEzPAZ61iYlKF2/vT9U+iDMo00TzpQYXdHNw4HuH8qaOSGBytAxCXFxBSfkjCKkpCPJaO3Xje5umHKojg5KebYAbNi0V+75I3+ywyTehzQRWJVND3iPnZWj7KoB6Ix8kdR1QPh0lBaKaPrbqRbAzdT3LwyMFVtPG2DZmCMAZR02Aw0+YPIY1zxl3yhXAvaJxwHeDJma4odq6nD1sQ=

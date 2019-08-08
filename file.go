@@ -60,10 +60,8 @@ func openFile(filename string, isAppend bool) (f *os.File, err error) {
 func checkDir(filename string) (err error) {
 
 	dir, _ := filepath.Split(filename)
-
 	if dir == `` {
-		fmt.Println(`no dir`, filename)
-		return
+		return fmt.Errorf(`no dir %s`, filename)
 	}
 
 	err = os.MkdirAll(dir, 0755)

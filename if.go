@@ -81,13 +81,13 @@ func (o *Logger) Logf(format string, a ...interface{}) (err error) {
 }
 
 // Print just like log.Print, added linebreak
-func (o *Logger) Print(format string, a ...interface{}) (err error) {
+func (o *Logger) Print(a ...interface{}) (err error) {
 	return o.sendLog(msgPrint, a...)
 }
 
 // Compact just like fmt.Print, but no spaces
-func (o *Logger) Compact(format string, a ...interface{}) (err error) {
-	return o.sendLog(msgCompact, format, fmt.Sprintf(format, a...))
+func (o *Logger) Compact(a ...interface{}) (err error) {
+	return o.sendLog(msgCompact, a...)
 }
 
 // Raw log raw (no time, no linebreak, no spaces)

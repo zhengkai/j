@@ -21,7 +21,7 @@ func task() {
 func taskColorOnce() {
 
 	re := regexp.MustCompile(`(A|B|C)`)
-	repl := aurora.Bold(aurora.Cyan("$1")).String()
+	repl := aurora.Bold(aurora.Red("$1")).String()
 	fn := func(s *string) {
 		r := re.ReplaceAllString(*s, repl)
 		*s = r
