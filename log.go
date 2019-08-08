@@ -22,7 +22,7 @@ func (o *Logger) sendLog(t msgType, content ...interface{}) (err error) {
 
 	if !m.raw {
 
-		if o.caller > 0 {
+		if o.caller != CallerNone {
 			_, file, line, ok := runtime.Caller(2)
 			c := &caller{}
 			if ok {
@@ -140,7 +140,7 @@ func parseByMsgType(m *msg, buf *bytes.Buffer) {
 		buf.WriteString(fmt.Sprintln(m.content...))
 
 	case msgPrintf:
-		buf.WriteString(fmt.Sprintf(m.content[0].(string), m.content[1:]...))
+		buf.WriteString(m.content[0].(string))
 
 	case msgPrint:
 		buf.WriteString(fmt.Sprint(m.content...))

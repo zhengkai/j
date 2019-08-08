@@ -6,8 +6,7 @@ install:
 - go get golang.org/x/tools/cmd/cover
 - go get github.com/mattn/goveralls
 script:
-- cd test && go test -v -test.bench=".*" -test.benchmem -coverpkg github.com/zhengkai/j -covermode=count -coverprofile=coverage.out .
-- "$HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN"
+- cd test && make
 env:
   matrix:
   - GO111MODULE=on

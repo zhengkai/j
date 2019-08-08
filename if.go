@@ -24,7 +24,7 @@ const (
 
 // just like Lshortfile/Llongfile in pkg/log
 const (
-	CallerNone = callerType(iota + 1)
+	CallerNone = callerType(iota)
 	CallerShort
 	CallerLong
 )
@@ -77,7 +77,7 @@ func (o *Logger) Log(a ...interface{}) (err error) {
 
 // Logf just like log.Printf
 func (o *Logger) Logf(format string, a ...interface{}) (err error) {
-	return o.sendLog(msgPrintf, format, fmt.Sprintf(format, a...))
+	return o.sendLog(msgPrintf, fmt.Sprintf(format, a...))
 }
 
 // Print just like log.Print, added linebreak
