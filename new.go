@@ -51,17 +51,26 @@ func NewPure(c *Config) (o *Logger, err error) {
 		caller:    c.Caller,
 	}
 
-	if c.FileFunc != nil {
-		o.fileFunc = c.FileFunc
-		now := time.Now()
-		c.Filename = c.FileFunc(&now)
-	}
-	if len(c.Filename) > 0 {
-		o.file, err = openFile(c.Filename, c.Append)
-		if err != nil {
-			o = nil
-			return
+	if c.File == nil {
+
+		o.fileSelf = true
+
+		if c.FileFunc != nil {
+			o.fileFunc = c.FileFunc
+			now := time.Now()
+			c.Filename = c.FileFunc(&now)
 		}
+		if len(c.Filename) > 0 {
+			o.file, err = openFile(c.Filename, c.Append)
+			if err != nil {
+				o = nil
+				return
+			}
+		}
+
+	} else {
+
+		o.file = c.File
 	}
 
 	if len(c.TimeFormat) > 0 {

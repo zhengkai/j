@@ -24,6 +24,7 @@ const (
 
 // Config for create logger
 type Config struct {
+	File       *os.File
 	Filename   string
 	FileFunc   func(t *time.Time) (filename string)
 	Echo       bool // stdout

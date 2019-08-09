@@ -89,11 +89,12 @@ func (o *Logger) doLog(m *msg) (err error) {
 		o.lineFunc(&s)
 	}
 
-	if o.file != nil {
-		_, err = o.file.WriteString(s)
+	f := o.file
+	if f != nil {
+		_, err = f.WriteString(s)
 		if err != nil {
 			o.enable = false
-			o.err = err
+			o.Error = err
 			return
 		}
 	}

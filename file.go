@@ -12,6 +12,18 @@ const (
 	flagAppend = os.O_CREATE | os.O_RDWR | os.O_SYNC | os.O_APPEND
 )
 
+// SetFile ...
+func (o *Logger) SetFile(f *os.File) {
+	o.file = f
+	o.fileSelf = false
+	o.fileFunc = nil
+}
+
+// GetFile ...
+func (o *Logger) GetFile() *os.File {
+	return o.file
+}
+
 func (o *Logger) changeFile(t *time.Time) {
 
 	if t == nil {
@@ -19,14 +31,18 @@ func (o *Logger) changeFile(t *time.Time) {
 		t = &now
 	}
 
-	filename := o.fileFunc(t)
+	fn := o.fileFunc
+	if fn == nil {
+		return
+	}
+	filename := fn(t)
 	if filename == o.filePrev {
 		return
 	}
 
 	file, err := openFile(filename, true)
 	if err != nil {
-		o.err = err
+		o.Error = err
 		o.filePrev = filename
 		return
 	}
@@ -61,7 +77,7 @@ func checkDir(filename string) (err error) {
 
 	dir, _ := filepath.Split(filename)
 	if dir == `` {
-		return fmt.Errorf(`no dir %s`, filename)
+		return
 	}
 
 	err = os.MkdirAll(dir, 0755)

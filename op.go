@@ -23,7 +23,9 @@ func (o *Logger) Close() {
 
 	if o.file != nil {
 		o.file.Sync()
-		o.file.Close()
+		if o.fileSelf {
+			o.file.Close()
+		}
 		o.file = nil
 	}
 }

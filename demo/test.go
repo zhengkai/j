@@ -23,7 +23,7 @@ func testColor(o *j.Logger) {
 		s := `` + v
 		o.Color(s)
 		o.Log(`color`, s)
-		o.ColorReset()
+		o.ColorStop()
 	}
 
 	o.Close()

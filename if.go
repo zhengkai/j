@@ -35,14 +35,16 @@ type callerType uint8
 
 // Logger ...
 type Logger struct {
+	Error error
+
 	file       *os.File
+	fileSelf   bool
 	enable     bool
 	echo       bool
 	useTime    bool
 	timeFormat string
 	usePrefix  bool
 	prefix     string
-	err        error
 	buf        *bytes.Buffer
 	stop       bool
 	stopWait   *sync.WaitGroup
