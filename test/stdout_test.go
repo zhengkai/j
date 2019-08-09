@@ -2,60 +2,13 @@ package j_test
 
 import (
 	"fmt"
-	"io/ioutil"
-	"os"
 	"regexp"
 	"testing"
 
 	"github.com/zhengkai/j"
 )
 
-var (
-	r, w, _ = os.Pipe()
-)
-
-type capturer struct {
-	r      *os.File
-	w      *os.File
-	stdout *os.File
-}
-
-func newCapturer() (c *capturer) {
-	c = &capturer{}
-	c.start()
-	return
-}
-
-func (c *capturer) start() {
-
-	c.r, c.w, _ = os.Pipe()
-
-	c.stdout = os.Stdout
-	os.Stdout = c.w
-}
-
-func (c *capturer) end() string {
-
-	c.w.Close()
-	out, _ := ioutil.ReadAll(c.r)
-	c.r.Close()
-
-	os.Stdout = c.stdout
-
-	return string(out)
-}
-
-func TestCapturer(t *testing.T) {
-	c := newCapturer()
-	fmt.Print(`foo`, `bar`)
-	s := c.end()
-
-	if s != `foobar` {
-		t.Fatal(`capturer fail`, s)
-	}
-}
-
-func TestEcho(t *testing.T) {
+func testEcho(t *testing.T) {
 
 	// Log
 
@@ -67,9 +20,12 @@ func TestEcho(t *testing.T) {
 	s := c.end()
 	x.Close()
 
-	re := regexp.MustCompile(`^\d{2}:\d{2}:\d{2}\.\d{3} stdout_test.go:\d+ foo bar` + "\n$")
+	replaceTime(&s)
+	replaceCaller(&s)
 
-	if !re.MatchString(s) {
+	str := "[TIME] [CALLER] foo bar\n"
+
+	if s != str {
 		t.Error(`method "Log" fail`)
 	}
 
@@ -117,7 +73,9 @@ func TestEcho(t *testing.T) {
 
 	s = c.end()
 
-	re = regexp.MustCompile(`^20[1-9]\d((/.+)*)/stdout_test.go:\d+ print123 321foobar` + "\n$")
+	replaceCaller(&s)
+
+	re := regexp.MustCompile(`^20[1-9]\d((/.+)*)/\[CALLER\] print123 321foobar` + "\n$")
 
 	if !re.MatchString(s) {
 		t.Error(`method "Print" fail`)
@@ -159,8 +117,10 @@ func TestEcho(t *testing.T) {
 		t.Error(`method "Raw" or "BR" fail`)
 	}
 
+	c = newCapturer()
 	m := j.GetDefault()
 	for k, v := range m {
 		fmt.Printf("%10s: %v\n", k, v)
 	}
+	c.end()
 }

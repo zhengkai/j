@@ -24,7 +24,7 @@ const (
 
 // just like Lshortfile/Llongfile in pkg/log
 const (
-	CallerNone = callerType(iota)
+	CallerNone = callerType(iota + 1)
 	CallerShort
 	CallerLong
 )

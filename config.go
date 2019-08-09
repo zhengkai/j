@@ -41,6 +41,14 @@ type Config struct {
 // ConfigKey for SetDefault
 type configKey uint8
 
+func initColor() {
+	configDefault[Echo] = true
+	configDefault[TimeFormat] = TimeMS
+	configDefault[Caller] = CallerShort
+	configDefault[PermDir] = os.FileMode(0755)
+	configDefault[PermFile] = os.FileMode(0644)
+}
+
 func (c configKey) String() string {
 
 	switch c {

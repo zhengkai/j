@@ -22,7 +22,7 @@ func (o *Logger) sendLog(t msgType, content ...interface{}) (err error) {
 
 	if !m.raw {
 
-		if o.caller != CallerNone {
+		if o.caller > CallerNone {
 			_, file, line, ok := runtime.Caller(2)
 			c := &caller{}
 			if ok {
@@ -82,7 +82,9 @@ func (o *Logger) doLog(m *msg) (err error) {
 		o.changeFile(m.time)
 	}
 
-	o.parseMsg(m)
+	if !o.parseMsg(m) {
+		return
+	}
 	s := o.buf.String()
 
 	if !m.raw && o.lineFunc != nil {
@@ -106,11 +108,11 @@ func (o *Logger) doLog(m *msg) (err error) {
 	return
 }
 
-func (o *Logger) parseMsg(m *msg) {
+func (o *Logger) parseMsg(m *msg) bool {
 
 	if m.t == msgColor || m.t == msgColorOnce {
 		o.parseMsgColor(m.t, m.content[0].(string))
-		return
+		return false
 	}
 	o.buf.Reset()
 
@@ -123,6 +125,8 @@ func (o *Logger) parseMsg(m *msg) {
 	if !m.raw {
 		o.parseMsgBR(m)
 	}
+
+	return true
 }
 
 func (o *Logger) parseMsgColor(t msgType, color string) {
@@ -167,9 +171,9 @@ func (o *Logger) parseMsgBR(m *msg) {
 	if o.useColor {
 
 		if addedBR {
-			o.buf.UnreadByte()
+			o.buf.Truncate(o.buf.Len() - 1)
+			addedBR = false
 		}
-
 		o.buf.WriteString("\x1b[0m")
 
 		if o.stopColor {
