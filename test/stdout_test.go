@@ -77,7 +77,7 @@ func TestEcho(t *testing.T) {
 
 	c = newCapturer()
 
-	x1, err := j.New(&j.Config{
+	x1, err := j.NewPure(&j.Config{
 		Echo:   true,
 		Prefix: `[ T1 ] `,
 		Tunnel: 1000,
@@ -85,7 +85,7 @@ func TestEcho(t *testing.T) {
 	})
 
 	if err != nil {
-		t.Error(`func "New" fail`)
+		t.Error(`func "NewPure" fail`)
 	}
 
 	x1.Logf(`foo: %dv%s`, 321, `zhengkai`)
@@ -127,7 +127,7 @@ func TestEcho(t *testing.T) {
 
 	c = newCapturer()
 
-	x1, err = j.New(&j.Config{
+	x1, err = j.NewPure(&j.Config{
 		Echo:   true,
 		Prefix: "\n",
 	})
@@ -157,5 +157,10 @@ func TestEcho(t *testing.T) {
 	s = c.end()
 	if s != "foo123\nbar321\n" {
 		t.Error(`method "Raw" or "BR" fail`)
+	}
+
+	m := j.GetDefault()
+	for k, v := range m {
+		fmt.Printf("%10s: %v\n", k, v)
 	}
 }

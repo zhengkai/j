@@ -102,3 +102,18 @@ func (o *Logger) Raw(a ...interface{}) (err error) {
 func (o *Logger) BR() (err error) {
 	return o.sendLog(msgRaw, "\n")
 }
+
+func (c callerType) String() string {
+
+	switch c {
+
+	case CallerNone:
+		return `none`
+	case CallerShort:
+		return `short`
+	case CallerLong:
+		return `long`
+	}
+
+	return `unknown`
+}

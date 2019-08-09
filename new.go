@@ -8,9 +8,7 @@ import (
 // NewEcho create a new logger without file, only stdout
 func NewEcho() (o *Logger) {
 	config := &Config{
-		Echo:       true,
-		TimeFormat: TimeMS,
-		Caller:     CallerShort,
+		Echo: true,
 	}
 	o, _ = New(config)
 	return
@@ -19,9 +17,7 @@ func NewEcho() (o *Logger) {
 // NewFile create a new logger with filename
 func NewFile(filename string) (o *Logger, err error) {
 	config := &Config{
-		Filename:   filename,
-		TimeFormat: TimeMS,
-		Caller:     CallerShort,
+		Filename: filename,
 	}
 	return New(config)
 }
@@ -29,16 +25,22 @@ func NewFile(filename string) (o *Logger, err error) {
 // NewFunc create a new logger with FileFunc
 func NewFunc(fn func(t *time.Time) (filename string)) (o *Logger, err error) {
 	config := &Config{
-		FileFunc:   fn,
-		Append:     true,
-		TimeFormat: TimeMS,
-		Caller:     CallerShort,
+		FileFunc: fn,
+		Append:   true,
 	}
 	return New(config)
 }
 
-// New create a new logger with config
+// New create a new logger
 func New(c *Config) (o *Logger, err error) {
+
+	applyConfig(c)
+
+	return NewPure(c)
+}
+
+// NewPure create a new logger without default config
+func NewPure(c *Config) (o *Logger, err error) {
 
 	o = &Logger{
 		enable:    true,
