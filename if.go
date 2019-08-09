@@ -46,6 +46,9 @@ type Logger struct {
 	buf        *bytes.Buffer
 	stop       bool
 	stopWait   *sync.WaitGroup
+	useColor   bool
+	stopColor  bool
+	color      string
 	colorOnce  bool
 	useTunnel  bool
 	tunnel     chan *msg

@@ -2,24 +2,8 @@ package j
 
 import (
 	"bytes"
-	"os"
 	"time"
 )
-
-// Config ...
-type Config struct {
-	Filename   string
-	Echo       bool // stdout
-	Append     bool
-	Prefix     string
-	TimeFormat string
-	Tunnel     int // channel buffer size
-	FileFunc   func(t *time.Time) (filename string)
-	LineFunc   func(line *string)
-	Caller     callerType
-	UmarkFile  os.FileMode
-	UmarkDir   os.FileMode
-}
 
 // NewEcho create a new logger without file, only stdout
 func NewEcho() (o *Logger) {
@@ -62,9 +46,8 @@ func New(c *Config) (o *Logger, err error) {
 		buf:       &bytes.Buffer{},
 		useTunnel: c.Tunnel > 0,
 		lineFunc:  c.LineFunc,
+		caller:    c.Caller,
 	}
-
-	o.caller = c.Caller
 
 	if c.FileFunc != nil {
 		o.fileFunc = c.FileFunc
