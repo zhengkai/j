@@ -42,6 +42,8 @@ func New(c *Config) (o *Logger, err error) {
 // NewPure create a new logger without default config
 func NewPure(c *Config) (o *Logger, err error) {
 
+	applyFileConfig(c)
+
 	o = &Logger{
 		enable:    true,
 		echo:      c.Echo,
@@ -49,6 +51,8 @@ func NewPure(c *Config) (o *Logger, err error) {
 		useTunnel: c.Tunnel > 0,
 		lineFunc:  c.LineFunc,
 		caller:    c.Caller,
+		permFile:  c.PermFile,
+		permDir:   c.PermDir,
 	}
 
 	if c.File == nil {
@@ -59,9 +63,10 @@ func NewPure(c *Config) (o *Logger, err error) {
 			o.fileFunc = c.FileFunc
 			now := time.Now()
 			c.Filename = c.FileFunc(&now)
+			c.Append = true
 		}
 		if len(c.Filename) > 0 {
-			o.file, err = openFile(c.Filename, c.Append)
+			o.file, err = o.openFile(c.Filename, c.Append)
 			if err != nil {
 				o = nil
 				return

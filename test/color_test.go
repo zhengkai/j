@@ -35,6 +35,8 @@ func testColor(t *testing.T) {
 	x.ColorOnce(color)
 	x.Log(4, `color once`)
 
+	x.Raw(`raw`)
+
 	x.Log(`5 no color`)
 
 	s := c.end()
@@ -49,10 +51,10 @@ func testColor(t *testing.T) {
 [COLOR_START][TIME] [CALLER] 2 color test again[COLOR_END]
 [TIME] [CALLER] 3 no color
 [COLOR_START][TIME] [CALLER] 4 color once[COLOR_END]
-[TIME] [CALLER] 5 no color` + "\n"
+raw[TIME] [CALLER] 5 no color` + "\n"
 
 	if sr != str {
-		t.Error(`method "Color" fail`)
+		t.Error(`method "Color" fail`, str, sr)
 	}
 
 	sf, err := loadFile(filename)
@@ -69,7 +71,10 @@ func testColor(t *testing.T) {
 	x2, err := j.New(&j.Config{
 		File: x.GetFile(),
 	})
+
+	c = newCapturer()
 	x2.Raw(sc)
+	c.end()
 
 	sf, err = loadFile(filename)
 	if err != nil {

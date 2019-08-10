@@ -58,6 +58,9 @@ type Logger struct {
 	filePrev   string
 	lineFunc   func(line *string)
 	caller     callerType
+
+	permFile os.FileMode
+	permDir  os.FileMode
 }
 
 type msg struct {

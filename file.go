@@ -1,7 +1,6 @@
 package j
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"time"
@@ -24,28 +23,24 @@ func (o *Logger) GetFile() *os.File {
 	return o.file
 }
 
-func (o *Logger) changeFile(t *time.Time) {
+func (o *Logger) changeFile(t *time.Time, fileFunc func(t *time.Time) (filename string)) {
 
 	if t == nil {
 		now := time.Now()
 		t = &now
 	}
 
-	fn := o.fileFunc
-	if fn == nil {
-		return
-	}
-	filename := fn(t)
+	filename := fileFunc(t)
 	if filename == o.filePrev {
 		return
 	}
 
-	file, err := openFile(filename, true)
+	file, err := o.openFile(filename, true)
 	if err != nil {
 		o.Error = err
-		o.filePrev = filename
 		return
 	}
+	o.filePrev = filename
 
 	o.file.Sync()
 	o.file.Close()
@@ -53,9 +48,9 @@ func (o *Logger) changeFile(t *time.Time) {
 	o.file = file
 }
 
-func openFile(filename string, isAppend bool) (f *os.File, err error) {
+func (o *Logger) openFile(filename string, isAppend bool) (f *os.File, err error) {
 
-	err = checkDir(filename)
+	err = checkDir(filename, o.permDir)
 	if err != nil {
 		return
 	}
@@ -65,7 +60,7 @@ func openFile(filename string, isAppend bool) (f *os.File, err error) {
 		flag = flagAppend
 	}
 
-	f, err = os.OpenFile(filename, flag, 0644)
+	f, err = os.OpenFile(filename, flag, o.permFile)
 	if err != nil {
 		return
 	}
@@ -73,26 +68,16 @@ func openFile(filename string, isAppend bool) (f *os.File, err error) {
 	return
 }
 
-func checkDir(filename string) (err error) {
+func checkDir(filename string, perm os.FileMode) (err error) {
 
 	dir, _ := filepath.Split(filename)
 	if dir == `` {
 		return
 	}
 
-	err = os.MkdirAll(dir, 0755)
+	err = os.MkdirAll(dir, perm)
 	if err != nil {
 		return
-	}
-
-	f, err := os.Lstat(dir)
-	if err != nil {
-		return
-	}
-
-	mode := f.Mode()
-	if !mode.IsDir() {
-		return fmt.Errorf(`not a dir "%s"`, dir)
 	}
 
 	return

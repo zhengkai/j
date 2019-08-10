@@ -9,6 +9,13 @@ import (
 	"strings"
 )
 
+func getPerm(filename string) os.FileMode {
+	file, _ := os.Open(filename)
+	info, _ := file.Stat()
+	mode := info.Mode()
+	return mode.Perm()
+}
+
 func loadFile(filename string) (s string, err error) {
 	file, err := os.Open(filename)
 	if err != nil {

@@ -14,6 +14,10 @@ var (
 
 func (o *Logger) sendLog(t msgType, content ...interface{}) (err error) {
 
+	if !o.enable {
+		return
+	}
+
 	m := &msg{
 		t:       t,
 		content: content,
@@ -78,8 +82,9 @@ func (o *Logger) bgLog() {
 
 func (o *Logger) doLog(m *msg) (err error) {
 
-	if o.fileFunc != nil {
-		o.changeFile(m.time)
+	ffn := o.fileFunc
+	if ffn != nil {
+		o.changeFile(m.time, ffn)
 	}
 
 	if !o.parseMsg(m) {

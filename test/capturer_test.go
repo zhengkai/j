@@ -49,4 +49,7 @@ func TestCapturer(t *testing.T) {
 
 	t.Run(`echo`, testEcho)
 	t.Run(`color`, testColor)
+	t.Run(`pointless`, testPointless)
+	t.Run(`file`, testFile)
+	t.Run(`lineFunc`, testLineFunc)
 }

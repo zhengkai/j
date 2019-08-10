@@ -1,7 +1,6 @@
 package j_test
 
 import (
-	"fmt"
 	"regexp"
 	"testing"
 
@@ -15,6 +14,11 @@ func testEcho(t *testing.T) {
 	c := newCapturer()
 
 	x := j.NewEcho()
+
+	// x.Enable(false)
+	// x.Log(`hide & seek`)
+	// x.Enable(true)
+
 	x.Log(`foo`, `bar`)
 
 	s := c.end()
@@ -26,7 +30,7 @@ func testEcho(t *testing.T) {
 	str := "[TIME] [CALLER] foo bar\n"
 
 	if s != str {
-		t.Error(`method "Log" fail`)
+		t.Error(`method "Log" fail`, s, str)
 	}
 
 	// Logf
@@ -41,8 +45,11 @@ func testEcho(t *testing.T) {
 	})
 
 	if err != nil {
-		t.Error(`func "NewPure" fail`)
+		t.Error(`func "NewPure" fail`, err)
 	}
+
+	x1.Enable(false)
+	x1.Enable(true)
 
 	x1.Logf(`foo: %dv%s`, 321, `zhengkai`)
 	x1.Close()
@@ -65,7 +72,7 @@ func testEcho(t *testing.T) {
 	})
 
 	if err != nil {
-		t.Error(`func "New" fail`)
+		t.Error(`func "New" fail`, err)
 	}
 
 	x1.Print(`print`, 123, 321, `foo`, `bar`)
@@ -91,7 +98,7 @@ func testEcho(t *testing.T) {
 	})
 
 	if err != nil {
-		t.Error(`func "New" fail`)
+		t.Error(`new logger fail`, err)
 	}
 
 	x1.Compact(`compact`, 123, 321, `foo`, `bar`)
@@ -116,11 +123,4 @@ func testEcho(t *testing.T) {
 	if s != "foo123\nbar321\n" {
 		t.Error(`method "Raw" or "BR" fail`)
 	}
-
-	c = newCapturer()
-	m := j.GetDefault()
-	for k, v := range m {
-		fmt.Printf("%10s: %v\n", k, v)
-	}
-	c.end()
 }

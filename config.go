@@ -111,7 +111,12 @@ func SetDefault(k configKey, v interface{}) (ok bool) {
 		}
 
 	case PermDir, PermFile:
+		var i int
 		var r os.FileMode
+		if i, ok = v.(int); ok {
+			configDefault[k] = os.FileMode(i)
+			return
+		}
 		if r, ok = v.(os.FileMode); ok {
 			configDefault[k] = r
 		}
@@ -185,6 +190,9 @@ func applyConfig(c *Config) {
 			c.LineFunc = v.(func(line *string))
 		}
 	}
+}
+
+func applyFileConfig(c *Config) {
 
 	if c.PermFile == 0 {
 		v, ok := configDefault[PermFile]
