@@ -18,8 +18,8 @@ func testColor(t *testing.T) {
 	filename := `log-color`
 
 	c := newCapturer()
-	x, err := j.NewFile(filename)
-	if err != nil {
+	x := j.NewFile(filename)
+	if x.Error != nil {
 		t.Error(`method "NewFile" fail`)
 	}
 
@@ -68,7 +68,7 @@ raw[TIME] [CALLER] 5 no color` + "\n"
 
 	sc := `continue`
 
-	x2, err := j.New(&j.Config{
+	x2 := j.New(&j.Config{
 		File: x.GetFile(),
 	})
 

@@ -15,7 +15,7 @@ const (
 func (o *Logger) SetFile(f *os.File) {
 	o.file = f
 	o.fileSelf = false
-	o.fileFunc = nil
+	o.fileFn = nil
 }
 
 // GetFile ...
@@ -23,21 +23,21 @@ func (o *Logger) GetFile() *os.File {
 	return o.file
 }
 
-func (o *Logger) changeFile(t *time.Time, fileFunc func(t *time.Time) (filename string)) {
+func (o *Logger) changeFile(t *time.Time, fileFn FileFunc) {
 
 	if t == nil {
 		now := time.Now()
 		t = &now
 	}
 
-	filename := fileFunc(t)
+	filename := fileFn(t)
 	if filename == o.filePrev {
 		return
 	}
 
-	file, err := o.openFile(filename, true)
-	if err != nil {
-		o.Error = err
+	var file *os.File
+	file, o.Error = o.openFile(filename, true)
+	if o.Error != nil {
 		return
 	}
 	o.filePrev = filename

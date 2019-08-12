@@ -82,7 +82,7 @@ func (o *Logger) bgLog() {
 
 func (o *Logger) doLog(m *msg) (err error) {
 
-	ffn := o.fileFunc
+	ffn := o.fileFn
 	if ffn != nil {
 		o.changeFile(m.time, ffn)
 	}
@@ -92,8 +92,11 @@ func (o *Logger) doLog(m *msg) (err error) {
 	}
 	s := o.buf.String()
 
-	if !m.raw && o.lineFunc != nil {
-		o.lineFunc(&s)
+	if !m.raw {
+		lfn := o.lineFn
+		if lfn != nil {
+			lfn(&s)
+		}
 	}
 
 	f := o.file

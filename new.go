@@ -10,12 +10,12 @@ func NewEcho() (o *Logger) {
 	config := &Config{
 		Echo: true,
 	}
-	o, _ = New(config)
+	o = New(config)
 	return
 }
 
 // NewFile create a new logger with filename
-func NewFile(filename string) (o *Logger, err error) {
+func NewFile(filename string) (o *Logger) {
 	config := &Config{
 		Filename: filename,
 	}
@@ -23,16 +23,16 @@ func NewFile(filename string) (o *Logger, err error) {
 }
 
 // NewFunc create a new logger with FileFunc
-func NewFunc(fn func(t *time.Time) (filename string)) (o *Logger, err error) {
+func NewFunc(fileFn FileFunc) (o *Logger) {
 	config := &Config{
-		FileFunc: fn,
-		Append:   true,
+		FileFn: fileFn,
+		Append: true,
 	}
 	return New(config)
 }
 
 // New create a new logger
-func New(c *Config) (o *Logger, err error) {
+func New(c *Config) (o *Logger) {
 
 	applyConfig(c)
 
@@ -40,7 +40,7 @@ func New(c *Config) (o *Logger, err error) {
 }
 
 // NewPure create a new logger without default config
-func NewPure(c *Config) (o *Logger, err error) {
+func NewPure(c *Config) (o *Logger) {
 
 	applyFileConfig(c)
 
@@ -49,7 +49,7 @@ func NewPure(c *Config) (o *Logger, err error) {
 		echo:      c.Echo,
 		buf:       &bytes.Buffer{},
 		useTunnel: c.Tunnel > 0,
-		lineFunc:  c.LineFunc,
+		lineFn:    c.LineFn,
 		caller:    c.Caller,
 		permFile:  c.PermFile,
 		permDir:   c.PermDir,
@@ -59,16 +59,16 @@ func NewPure(c *Config) (o *Logger, err error) {
 
 		o.fileSelf = true
 
-		if c.FileFunc != nil {
-			o.fileFunc = c.FileFunc
+		if c.FileFn != nil {
+			o.fileFn = c.FileFn
 			now := time.Now()
-			c.Filename = c.FileFunc(&now)
+			c.Filename = c.FileFn(&now)
 			c.Append = true
 		}
 		if len(c.Filename) > 0 {
-			o.file, err = o.openFile(c.Filename, c.Append)
-			if err != nil {
-				o = nil
+			o.file, o.Error = o.openFile(c.Filename, c.Append)
+			if o.Error != nil {
+				o.stop = true
 				return
 			}
 		}

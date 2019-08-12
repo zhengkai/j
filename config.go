@@ -2,7 +2,6 @@ package j
 
 import (
 	"os"
-	"time"
 )
 
 var (
@@ -16,7 +15,7 @@ const (
 	Prefix
 	TimeFormat
 	Tunnel
-	LineFunc
+	LineFn
 	Caller
 	PermFile
 	PermDir
@@ -26,13 +25,13 @@ const (
 type Config struct {
 	File       *os.File
 	Filename   string
-	FileFunc   func(t *time.Time) (filename string)
+	FileFn     FileFunc
 	Echo       bool // stdout
 	Append     bool
 	Prefix     string
 	TimeFormat string
 	Tunnel     int // channel buffer size
-	LineFunc   func(line *string)
+	LineFn     LineFunc
 	Caller     callerType
 	PermFile   os.FileMode
 	PermDir    os.FileMode
@@ -63,8 +62,8 @@ func (c configKey) String() string {
 		return `TimeFormat`
 	case Tunnel:
 		return `Tunnel`
-	case LineFunc:
-		return `LineFunc`
+	case LineFn:
+		return `LineFn`
 	case Caller:
 		return `Caller`
 	case PermFile:
@@ -98,7 +97,7 @@ func SetDefault(k configKey, v interface{}) (ok bool) {
 			configDefault[k] = r
 		}
 
-	case LineFunc:
+	case LineFn:
 		var r func(line *string)
 		if r, ok = v.(func(line *string)); ok {
 			configDefault[k] = r
@@ -184,10 +183,10 @@ func applyConfig(c *Config) {
 		}
 	}
 
-	if c.LineFunc == nil {
-		v, ok := configDefault[LineFunc]
+	if c.LineFn == nil {
+		v, ok := configDefault[LineFn]
 		if ok {
-			c.LineFunc = v.(func(line *string))
+			c.LineFn = v.(func(line *string))
 		}
 	}
 }

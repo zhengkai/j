@@ -37,15 +37,15 @@ func testEcho(t *testing.T) {
 
 	c = newCapturer()
 
-	x1, err := j.NewPure(&j.Config{
+	x1 := j.NewPure(&j.Config{
 		Echo:   true,
 		Prefix: `[ T1 ] `,
 		Tunnel: 1000,
 		Caller: j.CallerNone,
 	})
 
-	if err != nil {
-		t.Error(`func "NewPure" fail`, err)
+	if x1.Error != nil {
+		t.Error(`func "NewPure" fail`, x.Error)
 	}
 
 	x1.Enable(false)
@@ -64,15 +64,15 @@ func testEcho(t *testing.T) {
 
 	c = newCapturer()
 
-	x1, err = j.New(&j.Config{
+	x1 = j.New(&j.Config{
 		Echo:       true,
 		Tunnel:     1,
 		TimeFormat: `2006`,
 		Caller:     j.CallerLong,
 	})
 
-	if err != nil {
-		t.Error(`func "New" fail`, err)
+	if x1.Error != nil {
+		t.Error(`func "New" fail`, x1.Error)
 	}
 
 	x1.Print(`print`, 123, 321, `foo`, `bar`)
@@ -92,13 +92,13 @@ func testEcho(t *testing.T) {
 
 	c = newCapturer()
 
-	x1, err = j.NewPure(&j.Config{
+	x1 = j.NewPure(&j.Config{
 		Echo:   true,
 		Prefix: "\n",
 	})
 
-	if err != nil {
-		t.Error(`new logger fail`, err)
+	if x1.Error != nil {
+		t.Error(`new logger fail`, x1.Error)
 	}
 
 	x1.Compact(`compact`, 123, 321, `foo`, `bar`)

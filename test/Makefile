@@ -10,7 +10,10 @@ default:
 	@rm -f "$(coverage)"
 	@sudo mkdir log-dir-deny
 	@sudo chmod 0000 log-dir-deny
-	@go test -v -test.bench=".*" -test.benchmem -coverpkg github.com/zhengkai/j -covermode=count -coverprofile="$(coverage)"
+	@go test -v -test.bench=".*" -test.benchmem \
+		-coverpkg github.com/zhengkai/j -covermode=count -coverprofile="$(coverage)" \
+		| GREP_COLORS="mt=1;92" grep --color=always -E '^(|PASS)' \
+		| GREP_COLORS="mt=1;91" grep --color=always -E '^(|FAIL)'
 	@if [ -n "$$COVERALLS_TOKEN" ]; then \
 		"$$HOME/gopath/bin/goveralls" -coverprofile "$(coverage)" -service travis-ci -repotoken "$$COVERALLS_TOKEN" || : ; \
 	fi

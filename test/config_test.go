@@ -15,7 +15,7 @@ func TestConfig(t *testing.T) {
 	s += j.Append.String()
 	s += j.Prefix.String()
 	s += j.Tunnel.String()
-	s += j.LineFunc.String()
+	s += j.LineFn.String()
 
 	var ok bool
 
@@ -43,7 +43,7 @@ func TestConfig(t *testing.T) {
 	}
 
 	i := 0
-	j.SetDefault(j.LineFunc, func(line *string) {
+	j.SetDefault(j.LineFn, func(line *string) {
 		i++
 	})
 
@@ -56,5 +56,5 @@ func TestConfig(t *testing.T) {
 	j.UnsetDefault(j.Tunnel)
 	j.UnsetDefault(j.Prefix)
 	j.UnsetDefault(j.Caller)
-	j.UnsetDefault(j.LineFunc)
+	j.UnsetDefault(j.LineFn)
 }

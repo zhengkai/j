@@ -18,8 +18,8 @@ func testLineFunc(t *testing.T) {
 
 	c := newCapturer()
 
-	x, _ := j.New(&j.Config{
-		LineFunc: fn,
+	x := j.New(&j.Config{
+		LineFn: fn,
 	})
 	x.Log(`123fo`, `obar321`)
 	x.Print(`123fo`, `obar321`)

@@ -18,15 +18,15 @@ func testFile(t *testing.T) {
 
 	j.SetDefault(j.Echo, false)
 
-	x1, err := j.New(&j.Config{
+	x1 := j.New(&j.Config{
 		Filename: `log-dir/new-one.txt`,
 		Echo:     false,
 		PermDir:  0700,
 		Tunnel:   10,
 	})
 
-	if err != nil {
-		t.Error(`new file logger fail`, err)
+	if x1.Error != nil {
+		t.Error(`new file logger fail`, x1.Error)
 	}
 
 	x1.Log(`new`)
@@ -38,7 +38,7 @@ func testFile(t *testing.T) {
 
 	count = 0
 	rt := time.Now()
-	x2, err := j.NewFunc(func(t *time.Time) (filename string) {
+	x2 := j.NewFunc(func(t *time.Time) (filename string) {
 		count++
 		if count > 2 {
 			nt := rt.Add(time.Second)
@@ -50,8 +50,8 @@ func testFile(t *testing.T) {
 		return
 	})
 
-	if err != nil {
-		t.Error(`new file logger fail`, err)
+	if x2.Error != nil {
+		t.Error(`new file logger fail`, x2.Error)
 	}
 
 	x2.Log(`tick`)
@@ -76,31 +76,31 @@ func testFile(t *testing.T) {
 
 	x2.Close()
 
-	x2, err = j.NewFunc(func(t *time.Time) (filename string) {
+	x2 = j.NewFunc(func(t *time.Time) (filename string) {
 		return `log-dir/time-no-change.txt`
 	})
 	x2.Log(`tick`)
 	x2.Log(`tick`)
 	x2.Close()
 
-	x3, err := j.New(&j.Config{
+	x3 := j.New(&j.Config{
 		Filename: `log-dir`,
 	})
 
-	if x3 != nil || err == nil {
+	if x3.Error == nil {
 		t.Error(`no error when create file fail`)
 	}
 
-	x3, err = j.New(&j.Config{
+	x3 = j.New(&j.Config{
 		Filename: `log-dir-deny/dir/new-one.txt`,
 	})
 
-	if x3 != nil || err == nil {
+	if x3.Error == nil {
 		t.Error(`no error when create file fail`)
 	}
 
 	count = 0
-	x3, err = j.NewFunc(func(t *time.Time) (filename string) {
+	x3 = j.NewFunc(func(t *time.Time) (filename string) {
 		count++
 		if count <= 2 {
 			return `log-dir/func-success.txt`
@@ -126,7 +126,7 @@ func testFile(t *testing.T) {
 	x3.Close()
 	x3.Enable(false)
 
-	x4, err := j.New(&j.Config{
+	x4 := j.New(&j.Config{
 		Filename: `log-dir/new-fail.txt`,
 		Echo:     false,
 	})
