@@ -1,3 +1,14 @@
+// Package j implements a simple logging package. Easy to use.
+//
+// It has more feature than standard logger pkg, for example:
+//
+// · log files rotation
+//
+// · background (tunnel) write
+//
+// · ANSI color pre line
+//
+// · temporarily disable
 package j
 
 import (

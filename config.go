@@ -8,7 +8,7 @@ var (
 	configDefault = make(map[configKey]interface{})
 )
 
-// Config key
+// Config key, used by SetDefault()
 const (
 	Echo = configKey(iota + 1)
 	Append
@@ -23,14 +23,17 @@ const (
 
 // Config for create logger
 type Config struct {
-	File       *os.File
-	Filename   string
-	FileFn     FileFunc
+
+	// fill only one of them
+	File     *os.File
+	FileFn   FileFunc
+	Filename string
+
 	Echo       bool // stdout
 	Append     bool
 	Prefix     string
 	TimeFormat string
-	Tunnel     int // channel buffer size
+	Tunnel     int // channel buffer size, see also Close()
 	LineFn     LineFunc
 	Caller     callerType
 	PermFile   os.FileMode

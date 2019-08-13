@@ -2,7 +2,11 @@ package j
 
 import "sync"
 
-// Close ...
+// Close permanently disable Log() series.
+// log files will be closed, unless come from SetFile() or config File.
+//
+// Note: if create by config Tunnel, must use Close() to
+// wait that all logs have been processed
 func (o *Logger) Close() {
 	if o.stop {
 		return
@@ -30,7 +34,7 @@ func (o *Logger) Close() {
 	}
 }
 
-// Enable ...
+// Enable used to temporarily disable
 func (o *Logger) Enable(is bool) {
 	if o.stop {
 		return

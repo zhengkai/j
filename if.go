@@ -24,17 +24,17 @@ const (
 
 // just like Lshortfile/Llongfile in pkg/log
 const (
-	CallerNone = callerType(iota + 1)
-	CallerShort
-	CallerShorter
-	CallerLong
+	CallerNone    = callerType(iota + 1)
+	CallerShort   // caller.go:42
+	CallerShorter // caller:42
+	CallerLong    // /dir/caller.go:42
 )
 
 type msgType uint8
 type opType uint8
 type callerType uint8
 
-// Logger ...
+// Logger will be always returned by New series func, if there is any error, recorded in Error
 type Logger struct {
 	Error error
 
@@ -64,7 +64,13 @@ type Logger struct {
 	permDir  os.FileMode
 }
 
+// FileFunc is the type of the function called for getting filename.
+// If the filename is different from the previous one,
+// a new log file will be created
 type FileFunc func(t *time.Time) (filename string)
+
+// LineFunc is the type of the function called by from
+// Log / Logf / Print / Compact, but Raw.
 type LineFunc func(line *string)
 
 type msg struct {
@@ -102,7 +108,8 @@ func (o *Logger) Compact(a ...interface{}) (err error) {
 	return o.sendLog(msgCompact, a...)
 }
 
-// Raw log raw (no time, no linebreak, no spaces)
+// Raw log raw (no time, no linebreak, no spaces),
+// will not trigger lineFn(LineFunc)
 func (o *Logger) Raw(a ...interface{}) (err error) {
 	return o.sendLog(msgRaw, a...)
 }
