@@ -26,6 +26,7 @@ const (
 const (
 	CallerNone = callerType(iota + 1)
 	CallerShort
+	CallerShorter
 	CallerLong
 )
 

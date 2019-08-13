@@ -165,9 +165,16 @@ func (o *Logger) parseMsgPrefix(m *msg) {
 
 	if m.caller != nil {
 		file := m.caller.file
-		if o.caller == CallerShort {
+
+		switch o.caller {
+
+		case CallerShort:
 			_, file = filepath.Split(file)
+
+		case CallerShorter:
+			_, file = filepath.Split(file[0 : len(file)-3])
 		}
+
 		o.buf.WriteString(fmt.Sprintf(`%s:%d `, file, m.caller.line))
 	}
 }

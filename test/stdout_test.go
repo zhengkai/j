@@ -123,4 +123,20 @@ func testEcho(t *testing.T) {
 	if s != "foo123\nbar321\n" {
 		t.Error(`method "Raw" or "BR" fail`)
 	}
+
+	c = newCapturer()
+
+	x1 = j.NewPure(&j.Config{
+		Echo:   true,
+		Caller: j.CallerShorter,
+	})
+
+	x1.Log(`shorter`)
+
+	s = c.end()
+
+	re = regexp.MustCompile(`^stdout_test:\d+ shorter` + "\n$")
+	if !re.MatchString(s) {
+		t.Error(`caller shortest fail`, s)
+	}
 }
