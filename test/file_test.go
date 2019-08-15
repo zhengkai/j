@@ -83,11 +83,17 @@ func testFile(t *testing.T) {
 	x2.Log(`tick`)
 	x2.Close()
 
+	call := false
+	errorFn := func(o *j.Logger) {
+		call = true
+	}
+
 	x3 := j.New(&j.Config{
 		Filename: `log-dir`,
+		ErrorFn:  errorFn,
 	})
 
-	if x3.Error == nil {
+	if x3.Error == nil || !call {
 		t.Error(`no error when create file fail`)
 	}
 
@@ -100,16 +106,22 @@ func testFile(t *testing.T) {
 	}
 
 	count = 0
-	x3 = j.NewFunc(func(t *time.Time) (filename string) {
-		count++
-		if count <= 2 {
-			return `log-dir/func-success.txt`
-		}
-		return `log-dir-deny/fail.txt`
+
+	call = false
+
+	x3 = j.New(&j.Config{
+		FileFn: func(t *time.Time) (filename string) {
+			count++
+			if count <= 2 {
+				return `log-dir/func-success.txt`
+			}
+			return `log-dir-deny/fail.txt`
+		},
+		ErrorFn: errorFn,
 	})
 	x3.Enable(false)
 	x3.Log(`tick`)
-	if x3.Error != nil {
+	if x3.Error != nil || call {
 		t.Error(`unknown erro when "NewFunc()"`)
 	}
 	x3.Enable(true)
@@ -118,7 +130,7 @@ func testFile(t *testing.T) {
 		t.Error(`Enable() 1 fail`)
 	}
 	x3.Log(`tick`)
-	if x3.Error == nil {
+	if x3.Error == nil || !call {
 		t.Error(`no error when create file fail`)
 	}
 

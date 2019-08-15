@@ -53,6 +53,7 @@ func NewPure(c *Config) (o *Logger) {
 		caller:    c.Caller,
 		permFile:  c.PermFile,
 		permDir:   c.PermDir,
+		errorFn:   c.ErrorFn,
 	}
 
 	if c.File == nil {
@@ -66,9 +67,11 @@ func NewPure(c *Config) (o *Logger) {
 			c.Append = true
 		}
 		if len(c.Filename) > 0 {
-			o.file, o.Error = o.openFile(c.Filename, c.Append)
-			if o.Error != nil {
+			var err error
+			o.file, err = o.openFile(c.Filename, c.Append)
+			if err != nil {
 				o.stop = true
+				o.triggerError(err)
 				return
 			}
 		}

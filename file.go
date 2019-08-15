@@ -36,8 +36,10 @@ func (o *Logger) changeFile(t *time.Time, fileFn FileFunc) {
 	}
 
 	var file *os.File
-	file, o.Error = o.openFile(filename, true)
-	if o.Error != nil {
+	var err error
+	file, err = o.openFile(filename, true)
+	if err != nil {
+		o.triggerError(err)
 		return
 	}
 	o.filePrev = filename

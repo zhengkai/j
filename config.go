@@ -19,6 +19,7 @@ const (
 	Caller
 	PermFile
 	PermDir
+	ErrorFn
 )
 
 // Config for create logger
@@ -35,6 +36,7 @@ type Config struct {
 	TimeFormat string
 	Tunnel     int // channel buffer size, see also Close()
 	LineFn     LineFunc
+	ErrorFn    ErrorFunc
 	Caller     callerType
 	PermFile   os.FileMode
 	PermDir    os.FileMode
@@ -73,6 +75,8 @@ func (c configKey) String() string {
 		return `PermFile`
 	case PermDir:
 		return `PermDir`
+	case ErrorFn:
+		return `ErrorFunc`
 	}
 
 	return `unknown`
@@ -101,8 +105,8 @@ func SetDefault(k configKey, v interface{}) (ok bool) {
 		}
 
 	case LineFn:
-		var r func(line *string)
-		if r, ok = v.(func(line *string)); ok {
+		var r LineFunc
+		if r, ok = v.(func(*string)); ok {
 			configDefault[k] = r
 		}
 
@@ -120,6 +124,12 @@ func SetDefault(k configKey, v interface{}) (ok bool) {
 			return
 		}
 		if r, ok = v.(os.FileMode); ok {
+			configDefault[k] = r
+		}
+
+	case ErrorFn:
+		var r ErrorFunc
+		if r, ok = v.(func(*Logger)); ok {
 			configDefault[k] = r
 		}
 	}
@@ -189,7 +199,14 @@ func applyConfig(c *Config) {
 	if c.LineFn == nil {
 		v, ok := configDefault[LineFn]
 		if ok {
-			c.LineFn = v.(func(line *string))
+			c.LineFn = v.(LineFunc)
+		}
+	}
+
+	if c.ErrorFn == nil {
+		v, ok := configDefault[ErrorFn]
+		if ok {
+			c.ErrorFn = v.(ErrorFunc)
 		}
 	}
 }

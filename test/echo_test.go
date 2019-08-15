@@ -135,7 +135,7 @@ func testEcho(t *testing.T) {
 
 	s = c.end()
 
-	re = regexp.MustCompile(`^stdout_test:\d+ shorter` + "\n$")
+	re = regexp.MustCompile(`^echo_test:\d+ shorter` + "\n$")
 	if !re.MatchString(s) {
 		t.Error(`caller shortest fail`, s)
 	}

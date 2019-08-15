@@ -59,6 +59,7 @@ type Logger struct {
 	filePrev   string
 	lineFn     LineFunc
 	caller     callerType
+	errorFn    ErrorFunc
 
 	permFile os.FileMode
 	permDir  os.FileMode

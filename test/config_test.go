@@ -1,6 +1,7 @@
 package j_test
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
@@ -16,36 +17,55 @@ func TestConfig(t *testing.T) {
 	s += j.Prefix.String()
 	s += j.Tunnel.String()
 	s += j.LineFn.String()
+	s += j.ErrorFn.String()
 
 	var ok bool
 
-	j.SetDefault(j.Append, true)
+	ok = j.SetDefault(j.Append, true)
+	if !ok {
+		t.Error(`SetDefault fail`, j.Append)
+	}
 
-	j.SetDefault(j.Caller, j.CallerLong)
+	ok = j.SetDefault(j.Caller, j.CallerLong)
+	if !ok {
+		t.Error(`SetDefault fail`, j.Caller)
+	}
 
-	j.SetDefault(j.Prefix, `[prefix]`)
+	ok = j.SetDefault(j.Prefix, `[prefix]`)
+	if !ok {
+		t.Error(`SetDefault fail`, j.Prefix)
+	}
 
-	j.SetDefault(j.Tunnel, 100)
+	ok = j.SetDefault(j.Tunnel, 100)
+	if !ok {
+		t.Error(`SetDefault fail`, j.Tunnel)
+	}
 
 	ok = j.SetDefault(j.PermDir, os.FileMode(0775))
 	if !ok {
-		t.Error(`SetDefault fail`)
+		t.Error(`SetDefault fail`, j.PermDir)
 	}
 
-	j.SetDefault(j.PermDir, 0755)
+	ok = j.SetDefault(j.PermDir, 0755)
 	if !ok {
-		t.Error(`SetDefault fail`)
-	}
-
-	ok = j.SetDefault(j.PermDir, `0775`)
-	if ok {
-		t.Error(`SetDefault fail`)
+		t.Error(`SetDefault fail`, j.PermDir)
 	}
 
 	i := 0
-	j.SetDefault(j.LineFn, func(line *string) {
+	ok = j.SetDefault(j.LineFn, func(line *string) {
 		i++
+		fmt.Println(i)
 	})
+	if !ok {
+		t.Error(`SetDefault fail`, j.LineFn)
+	}
+
+	ok = j.SetDefault(j.ErrorFn, func(o *j.Logger) {
+		fmt.Println(o.Error)
+	})
+	if !ok {
+		t.Error(`SetDefault fail`, j.ErrorFn)
+	}
 
 	log := j.NewEcho()
 	log.Enable(false)
@@ -57,4 +77,5 @@ func TestConfig(t *testing.T) {
 	j.UnsetDefault(j.Prefix)
 	j.UnsetDefault(j.Caller)
 	j.UnsetDefault(j.LineFn)
+	j.UnsetDefault(j.ErrorFn)
 }

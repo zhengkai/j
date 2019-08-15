@@ -14,6 +14,7 @@ package j
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
 	"time"
@@ -56,7 +57,11 @@ func (o *Logger) sendLog(t msgType, content ...interface{}) (err error) {
 	}
 
 	if o.useTunnel {
-		o.tunnel <- m
+		select {
+		case o.tunnel <- m:
+		default:
+			o.triggerError(ErrTunnelOverflow)
+		}
 		return
 	}
 
@@ -115,13 +120,13 @@ func (o *Logger) doLog(m *msg) (err error) {
 		_, err = f.WriteString(s)
 		if err != nil {
 			o.enable = false
-			o.Error = err
+			o.triggerError(err)
 			return
 		}
 	}
 
 	if o.echo {
-		fmt.Print(s)
+		os.Stdout.WriteString(s)
 	}
 
 	return
