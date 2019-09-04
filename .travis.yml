@@ -1,15 +1,12 @@
 language: go
 go:
-- 1.12
-- master
+- 1.13
 install:
 - go get golang.org/x/tools/cmd/cover
 - go get github.com/mattn/goveralls
 script:
 - cd test && make
 env:
-  matrix:
-  - GO111MODULE=on
   global:
     secure: "u81Lzdjy6rujRhJPVQ5HuJGu4NKi+HMm9S1Mmrh3elxWV+zqbZ0dNAohisNAb3sw\
              nkLfRJ3VG5oDSDZKnTX9+8gzuI7iA/kFNsreKsuTpXM+HYmbPze6iqHuXU1n2dVU\
