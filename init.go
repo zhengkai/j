@@ -1,4 +1,4 @@
-package j
+package zj
 
 func init() {
 	initColor()

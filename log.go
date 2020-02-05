@@ -1,4 +1,4 @@
-// Package j implements a simple logging package. Easy to use.
+// Package zj implements a simple logging package. Easy to use.
 //
 // It has more feature than standard logger pkg, for example:
 //
@@ -9,7 +9,7 @@
 // · ANSI color pre line
 //
 // · temporarily disable
-package j
+package zj
 
 import (
 	"bytes"

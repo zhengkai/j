@@ -1,4 +1,4 @@
-package j_test
+package zj_test
 
 import (
 	"os"
@@ -7,7 +7,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zhengkai/j"
+	"github.com/zhengkai/zj"
+)
+
+var (
+	dir, _ = os.Getwd()
 )
 
 func testFile(t *testing.T) {
@@ -16,10 +20,10 @@ func testFile(t *testing.T) {
 
 	count := 0
 
-	j.SetDefault(j.Echo, false)
+	zj.SetDefault(zj.Echo, false)
 
-	x1 := j.New(&j.Config{
-		Filename: `log-dir/new-one.txt`,
+	x1 := zj.New(&zj.Config{
+		Filename: dir + `/log-dir/new-one.txt`,
 		Echo:     false,
 		PermDir:  0700,
 		Tunnel:   10,
@@ -38,7 +42,7 @@ func testFile(t *testing.T) {
 
 	count = 0
 	rt := time.Now()
-	x2 := j.NewFunc(func(t *time.Time) (filename string) {
+	x2 := zj.NewFunc(func(t *time.Time) (filename string) {
 		count++
 		if count > 2 {
 			nt := rt.Add(time.Second)
@@ -46,7 +50,7 @@ func testFile(t *testing.T) {
 		} else {
 			t = &rt
 		}
-		filename = t.Format(`log-dir/time-20060102-150405.txt`)
+		filename = t.Format(dir + `/log-dir/time-20060102-150405.txt`)
 		return
 	})
 
@@ -76,20 +80,20 @@ func testFile(t *testing.T) {
 
 	x2.Close()
 
-	x2 = j.NewFunc(func(t *time.Time) (filename string) {
-		return `log-dir/time-no-change.txt`
+	x2 = zj.NewFunc(func(t *time.Time) (filename string) {
+		return dir + `/log-dir/time-no-change.txt`
 	})
 	x2.Log(`tick`)
 	x2.Log(`tick`)
 	x2.Close()
 
 	call := false
-	errorFn := func(o *j.Logger) {
+	errorFn := func(o *zj.Logger) {
 		call = true
 	}
 
-	x3 := j.New(&j.Config{
-		Filename: `log-dir`,
+	x3 := zj.New(&zj.Config{
+		Filename: dir + `/log-dir`,
 		ErrorFn:  errorFn,
 	})
 
@@ -97,8 +101,8 @@ func testFile(t *testing.T) {
 		t.Error(`no error when create file fail`)
 	}
 
-	x3 = j.New(&j.Config{
-		Filename: `log-dir-deny/dir/new-one.txt`,
+	x3 = zj.New(&zj.Config{
+		Filename: dir + `/log-dir-deny/dir/new-one.txt`,
 	})
 
 	if x3.Error == nil {
@@ -109,13 +113,13 @@ func testFile(t *testing.T) {
 
 	call = false
 
-	x3 = j.New(&j.Config{
+	x3 = zj.New(&zj.Config{
 		FileFn: func(t *time.Time) (filename string) {
 			count++
 			if count <= 2 {
-				return `log-dir/func-success.txt`
+				return dir + `/log-dir/func-success.txt`
 			}
-			return `log-dir-deny/fail.txt`
+			return dir + `/log-dir-deny/fail.txt`
 		},
 		ErrorFn: errorFn,
 	})
@@ -138,8 +142,8 @@ func testFile(t *testing.T) {
 	x3.Close()
 	x3.Enable(false)
 
-	x4 := j.New(&j.Config{
-		Filename: `log-dir/new-fail.txt`,
+	x4 := zj.New(&zj.Config{
+		Filename: dir + `/log-dir/new-fail.txt`,
 		Echo:     false,
 	})
 
@@ -152,14 +156,14 @@ func testFile(t *testing.T) {
 		t.Error(`no error when write file fail`)
 	}
 
-	j.SetDefault(j.Echo, true)
+	zj.SetDefault(zj.Echo, true)
 
-	testFileCount(t)
+	// testFileCount(t)
 }
 
 func testFilePerm(t *testing.T) {
-	j.New(&j.Config{
-		Filename: `log-file`,
+	zj.New(&zj.Config{
+		Filename: dir + `/log-file`,
 		PermFile: 0600,
 	})
 	if getPerm(`log-file`) != 0600 {

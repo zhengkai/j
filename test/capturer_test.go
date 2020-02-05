@@ -1,4 +1,4 @@
-package j_test
+package zj_test
 
 import (
 	"fmt"

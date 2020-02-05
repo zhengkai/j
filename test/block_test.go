@@ -1,10 +1,10 @@
-package j_test
+package zj_test
 
 import (
 	"fmt"
 	"testing"
 
-	"github.com/zhengkai/j"
+	"github.com/zhengkai/zj"
 )
 
 func TestBlock(t *testing.T) {
@@ -15,11 +15,11 @@ func TestBlock(t *testing.T) {
 	}
 
 	errReport := false
-	errFn := func(o *j.Logger) {
+	errFn := func(o *zj.Logger) {
 		errReport = true
 	}
 
-	x := j.NewPure(&j.Config{
+	x := zj.NewPure(&zj.Config{
 		Echo:    true,
 		LineFn:  lineFn,
 		Tunnel:  3,
@@ -37,7 +37,7 @@ func TestBlock(t *testing.T) {
 	}
 
 	x.Log(`foo`)
-	if x.Error != j.ErrTunnelOverflow || !errReport {
+	if x.Error != zj.ErrTunnelOverflow || !errReport {
 		fmt.Println(`block no overflow error`, x.Error)
 	}
 	s := c.end()

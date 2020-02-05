@@ -1,4 +1,4 @@
-package j
+package zj
 
 // time format in config
 const (

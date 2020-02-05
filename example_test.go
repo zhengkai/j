@@ -1,14 +1,14 @@
-package j_test
+package zj_test
 
 import (
 	"regexp"
 	"time"
 
-	"github.com/zhengkai/j"
+	"github.com/zhengkai/zj"
 )
 
 func ExampleNewFunc() {
-	jx := j.NewFunc(func(t *time.Time) string {
+	jx := zj.NewFunc(func(t *time.Time) string {
 		return t.Format(`log/01-02/15.log`)
 	})
 	jx.Log(`file func`)
@@ -22,7 +22,7 @@ func ExampleLineFunc() {
 		*s = r
 	}
 
-	x := j.New(&j.Config{
+	x := zj.New(&zj.Config{
 		LineFn: fn,
 	})
 

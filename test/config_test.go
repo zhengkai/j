@@ -1,81 +1,81 @@
-package j_test
+package zj_test
 
 import (
 	"fmt"
 	"os"
 	"testing"
 
-	"github.com/zhengkai/j"
+	"github.com/zhengkai/zj"
 )
 
 func TestConfig(t *testing.T) {
 
-	x := j.Echo - 1
+	x := zj.Echo - 1
 
 	s := x.String()
-	s += j.Append.String()
-	s += j.Prefix.String()
-	s += j.Tunnel.String()
-	s += j.LineFn.String()
-	s += j.ErrorFn.String()
+	s += zj.Append.String()
+	s += zj.Prefix.String()
+	s += zj.Tunnel.String()
+	s += zj.LineFn.String()
+	s += zj.ErrorFn.String()
 
 	var ok bool
 
-	ok = j.SetDefault(j.Append, true)
+	ok = zj.SetDefault(zj.Append, true)
 	if !ok {
-		t.Error(`SetDefault fail`, j.Append)
+		t.Error(`SetDefault fail`, zj.Append)
 	}
 
-	ok = j.SetDefault(j.Caller, j.CallerLong)
+	ok = zj.SetDefault(zj.Caller, zj.CallerLong)
 	if !ok {
-		t.Error(`SetDefault fail`, j.Caller)
+		t.Error(`SetDefault fail`, zj.Caller)
 	}
 
-	ok = j.SetDefault(j.Prefix, `[prefix]`)
+	ok = zj.SetDefault(zj.Prefix, `[prefix]`)
 	if !ok {
-		t.Error(`SetDefault fail`, j.Prefix)
+		t.Error(`SetDefault fail`, zj.Prefix)
 	}
 
-	ok = j.SetDefault(j.Tunnel, 100)
+	ok = zj.SetDefault(zj.Tunnel, 100)
 	if !ok {
-		t.Error(`SetDefault fail`, j.Tunnel)
+		t.Error(`SetDefault fail`, zj.Tunnel)
 	}
 
-	ok = j.SetDefault(j.PermDir, os.FileMode(0775))
+	ok = zj.SetDefault(zj.PermDir, os.FileMode(0775))
 	if !ok {
-		t.Error(`SetDefault fail`, j.PermDir)
+		t.Error(`SetDefault fail`, zj.PermDir)
 	}
 
-	ok = j.SetDefault(j.PermDir, 0755)
+	ok = zj.SetDefault(zj.PermDir, 0755)
 	if !ok {
-		t.Error(`SetDefault fail`, j.PermDir)
+		t.Error(`SetDefault fail`, zj.PermDir)
 	}
 
 	i := 0
-	ok = j.SetDefault(j.LineFn, func(line *string) {
+	ok = zj.SetDefault(zj.LineFn, func(line *string) {
 		i++
 		fmt.Println(i)
 	})
 	if !ok {
-		t.Error(`SetDefault fail`, j.LineFn)
+		t.Error(`SetDefault fail`, zj.LineFn)
 	}
 
-	ok = j.SetDefault(j.ErrorFn, func(o *j.Logger) {
+	ok = zj.SetDefault(zj.ErrorFn, func(o *zj.Logger) {
 		fmt.Println(o.Error)
 	})
 	if !ok {
-		t.Error(`SetDefault fail`, j.ErrorFn)
+		t.Error(`SetDefault fail`, zj.ErrorFn)
 	}
 
-	log := j.NewEcho()
+	log := zj.NewEcho()
 	log.Enable(false)
 	log.Enable(true)
 	log.Close()
 
-	j.UnsetDefault(j.Append)
-	j.UnsetDefault(j.Tunnel)
-	j.UnsetDefault(j.Prefix)
-	j.UnsetDefault(j.Caller)
-	j.UnsetDefault(j.LineFn)
-	j.UnsetDefault(j.ErrorFn)
+	zj.UnsetDefault(zj.Append)
+	zj.UnsetDefault(zj.Tunnel)
+	zj.UnsetDefault(zj.Prefix)
+	zj.UnsetDefault(zj.Caller)
+	zj.UnsetDefault(zj.LineFn)
+	zj.UnsetDefault(zj.ErrorFn)
 }

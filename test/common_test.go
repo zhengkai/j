@@ -1,6 +1,7 @@
-package j_test
+package zj_test
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -10,8 +11,16 @@ import (
 )
 
 func getPerm(filename string) os.FileMode {
-	file, _ := os.Open(filename)
-	info, _ := file.Stat()
+	file, err := os.Open(filename)
+	if err != nil {
+		fmt.Println(`os.Open() fail`, filename, err)
+		return 0
+	}
+	info, err := file.Stat()
+	if err != nil {
+		fmt.Println(`file.Stat() fail`, filename, err)
+		return 0
+	}
 	mode := info.Mode()
 	return mode.Perm()
 }

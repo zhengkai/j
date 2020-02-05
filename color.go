@@ -1,4 +1,4 @@
-package j
+package zj
 
 // Color use ANSI color for each line
 func (o *Logger) Color(s string) (err error) {

@@ -1,10 +1,10 @@
-package j_test
+package zj_test
 
 import (
 	"regexp"
 	"testing"
 
-	"github.com/zhengkai/j"
+	"github.com/zhengkai/zj"
 )
 
 func testLineFunc(t *testing.T) {
@@ -18,7 +18,7 @@ func testLineFunc(t *testing.T) {
 
 	c := newCapturer()
 
-	x := j.New(&j.Config{
+	x := zj.New(&zj.Config{
 		LineFn: fn,
 	})
 	x.Log(`123fo`, `obar321`)

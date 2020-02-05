@@ -1,10 +1,10 @@
-package j_test
+package zj_test
 
 import (
 	"regexp"
 	"testing"
 
-	"github.com/zhengkai/j"
+	"github.com/zhengkai/zj"
 )
 
 var (
@@ -15,10 +15,10 @@ var (
 
 func testColor(t *testing.T) {
 
-	filename := `log-color`
+	filename := dir + `/log-color`
 
 	c := newCapturer()
-	x := j.NewFile(filename)
+	x := zj.NewFile(filename)
 	if x.Error != nil {
 		t.Error(`method "NewFile" fail`)
 	}
@@ -68,7 +68,7 @@ raw[TIME] [CALLER] 5 no color` + "\n"
 
 	sc := `continue`
 
-	x2 := j.New(&j.Config{
+	x2 := zj.New(&zj.Config{
 		File: x.GetFile(),
 	})
 

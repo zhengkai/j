@@ -1,10 +1,10 @@
-package j_test
+package zj_test
 
 import (
 	"regexp"
 	"testing"
 
-	"github.com/zhengkai/j"
+	"github.com/zhengkai/zj"
 )
 
 func testEcho(t *testing.T) {
@@ -13,7 +13,7 @@ func testEcho(t *testing.T) {
 
 	c := newCapturer()
 
-	x := j.NewEcho()
+	x := zj.NewEcho()
 
 	// x.Enable(false)
 	// x.Log(`hide & seek`)
@@ -37,11 +37,11 @@ func testEcho(t *testing.T) {
 
 	c = newCapturer()
 
-	x1 := j.NewPure(&j.Config{
+	x1 := zj.NewPure(&zj.Config{
 		Echo:   true,
 		Prefix: `[ T1 ] `,
 		Tunnel: 1000,
-		Caller: j.CallerNone,
+		Caller: zj.CallerNone,
 	})
 
 	if x1.Error != nil {
@@ -64,11 +64,11 @@ func testEcho(t *testing.T) {
 
 	c = newCapturer()
 
-	x1 = j.New(&j.Config{
+	x1 = zj.New(&zj.Config{
 		Echo:       true,
 		Tunnel:     1,
 		TimeFormat: `2006`,
-		Caller:     j.CallerLong,
+		Caller:     zj.CallerLong,
 	})
 
 	if x1.Error != nil {
@@ -92,7 +92,7 @@ func testEcho(t *testing.T) {
 
 	c = newCapturer()
 
-	x1 = j.NewPure(&j.Config{
+	x1 = zj.NewPure(&zj.Config{
 		Echo:   true,
 		Prefix: "\n",
 	})
@@ -126,9 +126,9 @@ func testEcho(t *testing.T) {
 
 	c = newCapturer()
 
-	x1 = j.NewPure(&j.Config{
+	x1 = zj.NewPure(&zj.Config{
 		Echo:   true,
-		Caller: j.CallerShorter,
+		Caller: zj.CallerShorter,
 	})
 
 	x1.Log(`shorter`)
