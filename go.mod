@@ -1,3 +1,3 @@
-module github.com/zhengkai/j
+module github.com/zhengkai/zj
 
 go 1.13

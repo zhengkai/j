@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+var curDir string
+
 const (
 	flagNew    = os.O_CREATE | os.O_RDWR | os.O_SYNC | os.O_TRUNC
 	flagAppend = os.O_CREATE | os.O_RDWR | os.O_SYNC | os.O_APPEND
@@ -51,6 +53,21 @@ func (o *Logger) changeFile(t *time.Time, fileFn FileFunc) {
 }
 
 func (o *Logger) openFile(filename string, isAppend bool) (f *os.File, err error) {
+
+	if len(filename) == 0 {
+		err = ErrFileNameEmpty
+		return
+	}
+
+	if filename[0] != '/' {
+		if curDir == `` {
+			curDir, err = filepath.Abs(filepath.Dir(os.Args[0]))
+			if err != nil {
+				return
+			}
+		}
+		filename = curDir + `/` + filename
+	}
 
 	err = checkDir(filename, o.permDir)
 	if err != nil {
