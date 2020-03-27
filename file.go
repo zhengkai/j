@@ -9,8 +9,8 @@ import (
 var curDir string
 
 const (
-	flagNew    = os.O_CREATE | os.O_RDWR | os.O_SYNC | os.O_TRUNC
-	flagAppend = os.O_CREATE | os.O_RDWR | os.O_SYNC | os.O_APPEND
+	flagNew    = os.O_CREATE | os.O_RDWR | os.O_TRUNC
+	flagAppend = os.O_CREATE | os.O_RDWR | os.O_APPEND
 )
 
 // SetFile ...
